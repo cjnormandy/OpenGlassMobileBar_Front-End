@@ -1,6 +1,6 @@
 <template>
   <div class="bg-gray-100">
-    <div class="absolute inset-x-0 top-20 z-50">
+    <div class="absolute inset-x-0 top-20 z-1">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl py-16 sm:py-24 lg:max-w-none lg:py-32">
           <h2 class="text-2xl font-bold text-gray-900">Collections</h2>
