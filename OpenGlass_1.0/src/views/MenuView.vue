@@ -1,88 +1,73 @@
 <template>
-  <div class="flex items-center top-10">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl py-16 sm:py-24 lg:max-w-none lg:py-32">
-        <ul role="list" class="divide-y divide-gray-100">
-          <li v-for="person in people" :key="person.email" class="flex justify-between gap-x-6 py-5">
-            <div class="flex min-w-0 gap-x-4">
-              <img class="h-12 w-12 flex-none rounded-full bg-gray-50" :src="person.imageUrl" alt="" />
-              <div class="min-w-0 flex-auto">
-                <p class="text-sm font-semibold leading-6 text-gray-900">{{ person.name }}</p>
-                <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{ person.email }}</p>
-              </div>
-            </div>
-            <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-              <p class="text-sm leading-6 text-gray-900">{{ person.role }}</p>
-              <p v-if="person.lastSeen" class="mt-1 text-xs leading-5 text-gray-500">
-                Last seen <time :datetime="person.lastSeenDateTime">{{ person.lastSeen }}</time>
-              </p>
-              <div v-else class="mt-1 flex items-center gap-x-1.5">
-                <div class="flex-none rounded-full bg-emerald-500/20 p-1">
-                  <div class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                </div>
-                <p class="text-xs leading-5 text-gray-500">Online</p>
-              </div>
-            </div>
-          </li>
-        </ul>
+  <div class="bg-white py-24 sm:py-32">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <img decoding="async" width="1536" height="2048" alt="" data-srcset="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png 1536w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-225x300.png 225w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-768x1024.png 768w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-1152x1536.png 1152w" data-src="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png" data-sizes="(max-width: 1536px) 100vw, 1536px" class="kb-img wp-image-492 lazyloaded" src="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png" sizes="(max-width: 1536px) 100vw, 1536px" srcset="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png 1536w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-225x300.png 225w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-768x1024.png 768w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-1152x1536.png 1152w">
+        <div
+          class="max-w-xs rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700">
+          <img
+            src="https://tecdn.b-cdn.net/img/new/standard/nature/184.jpg"
+            class="rounded-t-lg"
+            alt="..." />
+          <div class="p-6">
+            <h5
+              class="mb-2 text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
+              Card title
+            </h5>
+            <p class="mb-4 text-base text-neutral-600 dark:text-neutral-200">
+              Some quick example text to build on the card title and make up the
+              bulk of the card's content.
+            </p>
+            <button
+              type="button"
+              class="inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+              data-te-ripple-init
+              data-te-ripple-color="light">
+              Go somewhere
+            </button>
+          </div>
+        </div>
+        <div
+          class="max-w-xs rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700"
+          aria-hidden="true">
+          <img
+            src="https://tecdn.b-cdn.net/img/new/standard/nature/182.webp"
+            class="rounded-t-lg"
+            alt="..." />
+          <div class="p-6">
+            <h5
+              class="mb-2 animate-pulse text-xl font-medium text-neutral-900 dark:text-white">
+              <span
+                class="inline-block min-h-[1em] w-6/12 flex-auto cursor-wait bg-current align-middle opacity-50"></span>
+            </h5>
+            <p
+              class="mb-4 animate-pulse text-base text-neutral-700 dark:text-white">
+              <span
+                class="inline-block min-h-[1em] w-7/12 flex-auto cursor-wait bg-current align-middle opacity-50"></span>
+              <span
+                class="inline-block min-h-[1em] w-4/12 flex-auto cursor-wait bg-current align-middle opacity-50"></span>
+              <span
+                class="inline-block min-h-[1em] w-4/12 flex-auto cursor-wait bg-current align-middle opacity-50"></span>
+              <span
+                class="inline-block min-h-[1em] w-6/12 flex-auto cursor-wait bg-current align-middle opacity-50"></span>
+              <span
+                class="inline-block min-h-[1em] w-8/12 flex-auto cursor-wait bg-current align-middle opacity-50"></span>
+            </p>
+            <a
+              href="#"
+              tabindex="-1"
+              class="inline-block min-h-[1em] w-6/12 flex-auto cursor-wait rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white opacity-50 shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out before:inline-block before:content-[''] hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)]"></a>
+          </div>
+        </div>
       </div>
-    </div>
   </div>
 </template>
   
-  <script setup>
-  const people = [
-    {
-      name: 'Leslie Alexander',
-      email: 'leslie.alexander@example.com',
-      role: 'Co-Founder / CEO',
-      imageUrl:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Michael Foster',
-      email: 'michael.foster@example.com',
-      role: 'Co-Founder / CTO',
-      imageUrl:
-        'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Dries Vincent',
-      email: 'dries.vincent@example.com',
-      role: 'Business Relations',
-      imageUrl:
-        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: null,
-    },
-    {
-      name: 'Lindsay Walton',
-      email: 'lindsay.walton@example.com',
-      role: 'Front-end Developer',
-      imageUrl:
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Courtney Henry',
-      email: 'courtney.henry@example.com',
-      role: 'Designer',
-      imageUrl:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Tom Cook',
-      email: 'tom.cook@example.com',
-      role: 'Director of Product',
-      imageUrl:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: null,
-    },
-  ]
-  </script>
+<script>
+// Initialization for ES Users
+import {
+  Ripple,
+  initTE,
+} from "tw-elements";
+
+initTE({ Ripple });
+</script>
