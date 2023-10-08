@@ -1,84 +1,38 @@
 <template>
-  <div class="bg-gray-100">
-    <div class="absolute inset-x-0 top-40 z-1">
-      <div class="container mx-auto px-5 py-2 lg:px-32 lg:pt-12">
-        <div class="-m-1 flex flex-wrap md:-m-2">
-          <div class="flex w-1/3 flex-wrap">
-            <div class="w-full p-1 md:p-2">
-              <img
-                alt="gallery"
-                class="block h-full w-full rounded-lg object-cover object-center"
-                src="https://tecdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(73).webp" />
-            </div>
-          </div>
-          <div class="flex w-1/3 flex-wrap">
-            <div class="w-full p-1 md:p-2">
-              <img
-                alt="gallery"
-                class="block h-full w-full rounded-lg object-cover object-center"
-                src="https://tecdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(74).webp" />
-            </div>
-          </div>
-          <div class="flex w-1/3 flex-wrap">
-            <div class="w-full p-1 md:p-2">
-              <img
-                alt="gallery"
-                class="block h-full w-full rounded-lg object-cover object-center"
-                src="https://tecdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(75).webp" />
-            </div>
-          </div>
-          <div class="flex w-1/3 flex-wrap">
-            <div class="w-full p-1 md:p-2">
-              <img
-                alt="gallery"
-                class="block h-full w-full rounded-lg object-cover object-center"
-                src="https://tecdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(70).webp" />
-            </div>
-          </div>
-          <div class="flex w-1/3 flex-wrap">
-            <div class="w-full p-1 md:p-2">
-              <img
-                alt="gallery"
-                class="block h-full w-full rounded-lg object-cover object-center"
-                src="https://tecdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(76).webp" />
-            </div>
-          </div>
-          <div class="flex w-1/3 flex-wrap">
-            <div class="w-full p-1 md:p-2">
-              <img
-                alt="gallery"
-                class="block h-full w-full rounded-lg object-cover object-center"
-                src="https://tecdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(72).webp" />
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="p-4 grid grid-cols-2 gap-4">
+    <div v-for="image in images" :key="image.id" class="rounded-lg overflow-hidden">
+      <img :src="image.url" :alt="image.description" @click="openImage(image)" class="w-full h-auto transform transition-transform duration-300 hover:scale-105 cursor-pointer" />
+    </div>
+
+    <!-- Modal for larger view -->
+    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
+      <span @click="showModal = false" class="absolute top-4 right-6 text-white text-2xl font-bold cursor-pointer hover:text-gray-500">&times;</span>
+      <img :src="currentImage.url" :alt="currentImage.description" class="max-w-4/5 max-h-4/5 m-auto block" />
+      <div class="text-center text-white mt-4">{{ currentImage.description }}</div>
     </div>
   </div>
 </template>
 
-<script setup>
-const callouts = [
-  {
-    name: 'Desk and Office',
-    description: 'Work from home accessories',
-    imageSrc: 'https://tailwindui.com/img/ecommerce-images/home-page-02-edition-01.jpg',
-    imageAlt: 'Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.',
-    href: '#',
+<script>
+export default {
+  name: 'Gallery',
+  data() {
+    return {
+      images: [
+        { id: 1, url: '/gal_img1.png', description: 'Image 1 description' },
+        { id: 2, url: '/gal_img2.png', description: 'Image 2 description' },
+        { id: 3, url: '/gal_img3.png', description: 'Image 3 description' },
+      ],
+      showModal: false,
+      currentImage: {},
+    };
   },
-  {
-    name: 'Self-Improvement',
-    description: 'Journals and note-taking',
-    imageSrc: 'https://tailwindui.com/img/ecommerce-images/home-page-02-edition-02.jpg',
-    imageAlt: 'Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.',
-    href: '#',
+  methods: {
+    openImage(image) {
+      this.currentImage = image;
+      this.showModal = true;
+    },
   },
-  {
-    name: 'Travel',
-    description: 'Daily commute essentials',
-    imageSrc: 'https://tailwindui.com/img/ecommerce-images/home-page-02-edition-03.jpg',
-    imageAlt: 'Collection of four insulated travel bottles on wooden shelf.',
-    href: '#',
-  },
-]
+};
 </script>
+
