@@ -7,7 +7,7 @@ const navigation = [
   { name: 'Gallery', href: '/home' },
   { name: 'Menu', href: '/menu' },
   { name: 'Services', href: '/services' },
-  { name: 'Calender', href: '/calender' },
+  { name: 'Calendar', href: '/calendar' },
 ]
 
 const mobileMenuOpen = ref(false)
