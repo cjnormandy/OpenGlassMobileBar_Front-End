@@ -2,6 +2,8 @@
 import VueTailwindDatepicker from 'vue-tailwind-datepicker'
 import { ref, computed } from 'vue'
 
+const dateValue = ref([])
+
 const eventName = ref('')
 const eventDate = ref('')
 const hours = ref(0)
@@ -101,7 +103,7 @@ const calculatedResults = computed(() => {
                             <div class="sm:col-span-3">
                             <label for="first-name" class="block text-sm font-medium leading-6 text-gray-900">Date of Event</label>
                             <div class="border-b border-gray-900/10 pb-12">
-                                <VueTailwindDatepicker/>
+                                <vue-tailwind-datepicker v-model="dateValue" placeholder="My Placeholder" />
                             </div>
                             </div>
 
