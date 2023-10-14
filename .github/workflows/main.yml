@@ -22,5 +22,5 @@ jobs:
         working-directory: OpenGlass_1.0 
 
       - name: Run Cypress Component Tests
-        run: npm run test:components
+        run: npm run test:comps
         working-directory: OpenGlass_1.0 
