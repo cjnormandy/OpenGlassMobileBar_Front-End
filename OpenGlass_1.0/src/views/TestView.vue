@@ -28,7 +28,7 @@
                       <DialogTitle class="text-base font-semibold leading-6 text-gray-900">Panel title</DialogTitle>
                     </div>
                     <div class="relative mt-6 flex-1 px-4 sm:px-6">
-                      <!-- Your content -->
+                      <p>Testing the git actions feature.</p>
                     </div>
                   </div>
                 </DialogPanel>
