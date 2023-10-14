@@ -4,10 +4,12 @@ import { Dialog, DialogPanel } from '@headlessui/vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 const navigation = [
-  { name: 'Gallery', href: '/home' },
+  { name: 'About Us', href: '/about'},
+  { name: 'Gallery', href: '/home'},
   { name: 'Menu', href: '/menu' },
   { name: 'Services', href: '/services' },
   { name: 'Calendar', href: '/calendar' },
+  { name: 'FAQ', href: '/faq' },  
 ]
 
 const mobileMenuOpen = ref(false)
@@ -15,11 +17,11 @@ const mobileMenuOpen = ref(false)
 
 <template>
     <header class="absolute inset-x-0 top-0 z-50">
-      <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+      <nav class="flex items-center justify-between p-0 lg:px-8" aria-label="Global">
         <div class="flex lg:flex-1">
           <a href="/" class="-m-1.5 p-1.5">
             <span class="sr-only">Open Glass</span>
-            <img alt="Open Glass logo" class="logo" src="../assets/openg_logo.png" width="125" height="125" />
+            <img alt="Open Glass logo" class="logo" src="../assets/openg_logo.png" width="200" height="200" />
           </a>
         </div>
         <div class="flex lg:hidden">
@@ -41,7 +43,7 @@ const mobileMenuOpen = ref(false)
           <div class="flex items-center justify-between">
             <a href="#" class="-m-1.5 p-1.5">
               <span class="sr-only">Your Company</span>
-              <img alt="Open Glass logo" class="logo" src="../assets/openg_logo.png" width="125" height="125" />
+              <img alt="Open Glass logo" class="logo" src="../assets/openg_logo.png" width="200" height="200" />
             </a>
             <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
               <span class="sr-only">Close menu</span>
