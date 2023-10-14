@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: 16  # Use the version of Node.js you want
 
+      - name: Navigate to App Directory
+        run: cd OpenGlass_1.0
+
       - name: Install Dependencies
         run: npm install
 
