@@ -8,12 +8,9 @@
                       <img class="w-full" :src="service.image" alt="test">
                       <div class="px-6 py-4">
                         <div class="font-bold text-xl mb-2">{{ service.title }}</div>
-                        <p class="text-sm">{{ service.description }}</p>
-                      </div>
-                      <div class="px-6 pt-4 pb-2">
-                        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                        <ul class="text-gray-700 text-base text-left">
+                            <li v-for="descItem in service.description" :key="descItem">{{ descItem }}</li>
+                        </ul>
                       </div>
                     </div>
                   </div>
@@ -23,6 +20,9 @@
                     <select id="specialDrinks" v-model="selectedDrink" class="mt-1 p-2 rounded-md shadow-sm">
                         <option value="drink1">Special Drink 1</option>
                         <option value="drink2">Special Drink 2</option>
+                        <option value="drink1">Special Drink 3</option>
+                        <option value="drink2">Special Drink 4</option>
+                        <option value="drink1">Special Drink 5</option>
                     </select>
                 </div>
                 <div v-if="selectedDrink && !selectedDate" class="mt-6">
@@ -40,19 +40,8 @@
                 </div>
                 <div v-if="selectedTime" class="mt-6">
                     <div>
-                        <StripeElements
-                            v-if="stripeLoaded"
-                            v-slot="{ elements, instance }"
-                            :stripe-key="pk_test_51NzUcaDluQCGRUuAxAWcXePqwfKCxcuA2uOI0cTMR9gmb9S0oOg1t1ZQSZMRROWli2y7xAmQmrQ3m65Y2MMZmOQ700lEBYclIb"
-                        >
-                            <StripeElement
-                            v-on:ready="card = $event"
-                            :elements="elements"
-                            />
-                        </StripeElements>
-                        <button type="button" @click="createPaymentIntent()">Pay</button>
+                      <button @click="pay">pay</button>
                     </div>
-                    <button @click="payForService()" class="bg-blue-500 text-white p-2 rounded-md shadow-sm hover:bg-blue-600">Pay for Service</button>
                 </div>
             </div>
         </div>
@@ -85,22 +74,94 @@
         services: [
             {
                 title: 'SIMPLE GLASS',
-                description: 'Beer & wine service\nDescription: Perffect for those on a\nbudget, the Simple Glass tier offers\nessential bar services with a selection\nof 2 specialty drinks. Suitable for\nevents with up to 50 guests\n\nIncluded Services:\n- 1 Professional bartender\n- 3-hour service\n- 2 specialty drinks\n- Bar menu displayed\n- Mixers\n- Garnishes\n- Ice & cooling\n- Napkins, straws, & cups\n- Setup and cleanup\n*PACKAGE DOES NOT INCLUDE ALCOHOL',
+                description: [
+                    'Description: Perfect for those on a budget, the Simple Glass tier offers essential bar services with a selection of 2 specialty drinks.',
+                    'Suitable for events with up to 50 guests',
+                    'Included Services:',
+                    '- 1 Professional bartender',
+                    '- 3-hour service',
+                    '- 2 specialty drinks',
+                    '- Bar menu displayed',
+                    '- Mixers',
+                    '- Garnishes',
+                    '- Ice & cooling',
+                    '- Napkins, straws, & cups',
+                    '- Setup and cleanup',
+                    '*PACKAGE DOES NOT INCLUDE ALCOHOL'
+                ],
                 image: '/simple_glass.png'
             },
             {
                 title: 'PREMIUM GLASS',
-                description: 'Beer & wine service\nDescription: Elevate your event\nwith our Premium Glass tier,\nfeaturing a broader selection of 3\nspecialty drinks and upgraded\nservice. Ideal for events with up to\n100 guests\n\nIncluded Services:\n- 2 Professional bartenders\n- 3-hour service\n- 3 specialty drinks\n- Bar equipment\n- Bar menu displayed\n- Bar condiments\n- Mixers\n- Garnishes\n- Ice & cooling\n- Napkins, straws, & cups\n- Setup and cleanup\n*PACKAGE DOES NOT INCLUDE ALCOHOL',
+                description: [
+                  'Description: Elevate your event',
+                  'with our Premium Glass tier,',
+                  'featuring a broader selection of 3',
+                  'specialty drinks and upgraded',
+                  'service. Ideal for events with up to',
+                  '100 guests',
+                  'Included Services:',
+                  '- 2 Professional bartenders',
+                  '- 3-hour service',
+                  '- 3 specialty drinks',
+                  '- Bar equipment',
+                  '- Bar menu displayed',
+                  '- Bar condiments',
+                  '- Mixers',
+                  '- Garnishes',
+                  '- Ice & cooling',
+                  '- Napkins, straws, & cups',
+                  '- Setup and cleanup',
+                  '*PACKAGE DOES NOT INCLUDE ALCOHOL'
+                ],
                 image: '/premium_glass.png'
             },
             {
                 title: 'SIGNATURE GLASS',
-                description: 'Beer & wine service\nDescription: The ultimate\nexperience for those who want to\nimpress their guests with a wide\nrange of premium drinks and top-\nnotch service. Suitable for larger\nevents with up to 150 guests\n\nIncluded Services:\n- 2 Professional bartenders\n- 3-hour service\n- 5 specialty drinks\n- Unique serving presentations\n- Bar equipment\n- Custom cocktail menu tailored to your event\n- Bar condiments\n- Mixers\n- Garnishes\n- Ice & cooling\n- Napkins, straws, & cups\n- Setup and cleanup\n*PACKAGE DOES NOT INCLUDE ALCOHOL',
+                description: [
+                  'Description: The ultimate',
+                  'experience for those who want to',
+                  'impress their guests with a wide',
+                  'range of premium drinks and top-',
+                  'notch service. Suitable for larger',
+                  'events with up to 150 guests',
+                  'Included Services:',
+                  '- 2 Professional bartenders',
+                  '- 3-hour service',
+                  '- 5 specialty drinks',
+                  '- Unique serving presentations',
+                  '- Bar equipment',
+                  '- Custom cocktail menu tailored to your event',
+                  '- Bar condiments',
+                  '- Mixers',
+                  '- Garnishes',
+                  '- Ice & cooling',
+                  '- Napkins, straws, & cups',
+                  '- Setup and cleanup',
+                  '*PACKAGE DOES NOT INCLUDE ALCOHOL'
+                ],
                 image: '/signature_glass.png'
             },
             {
                 title: 'THE "OPEN GLASS"',
-                description: 'Beer & wine service\nDescription: For the most exclusive\nand personalized bar experience,\nchoose our Glass tier. We\'ll work\nclosely with you to create a one-\nof-a-kind bar experience that\nmatches your event\'s theme and\nrequirements. Pricing varies based\non customization. Tailored to the\nspecific needs of your event,\naccommodating even the largest\ngatherings.\n\n- Customizable service\n*We will provide a consultation to\ndiscuss your requirements and\nprovide you with a customized\nquote.',
+                description: [
+                  'Description: For the most exclusive',
+                  'and personalized bar experience,',
+                  'choose our Glass tier. We\'ll work',
+                  'closely with you to create a one-',
+                  'of-a-kind bar experience that',
+                  'matches your event\'s theme and',
+                  'requirements. Pricing varies based',
+                  'on customization. Tailored to the',
+                  'specific needs of your event,',
+                  'accommodating even the largest',
+                  'gatherings.',
+                  '- Customizable service',
+                  '*We will provide a consultation to',
+                  'discuss your requirements and',
+                  'provide you with a customized',
+                  'quote.'
+                ],
                 image: '/open_glass.png'
             }
         ],
@@ -132,6 +193,9 @@
         this.selectedService = null;
         this.selectedDate = null;
         this.selectedTime = null;
+      },
+      pay() {
+        window.location.href = 'https://buy.stripe.com/test_9AQ6p99Il8rLfYY144';
       },
       createPaymentIntent() {
         fetch('https://mud-honey-coast.glitch.me/create-payment-intent', {
