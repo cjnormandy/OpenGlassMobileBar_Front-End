@@ -1,0 +1,16 @@
+{
+  "name": "node-mysql-app",
+  "version": "1.0.0",
+  "description": "Node.js application connection to MySQL database",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
+    "node": "^21.0.0"
+  }
+}
