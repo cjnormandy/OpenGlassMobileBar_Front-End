@@ -1,4 +1,7 @@
+const express = require('express');
 const mysql = require('mysql');
+
+const app = express();
 
 const db = mysql.createConnection({
   host: 'testopenglass.cvr0psvcqanz.us-east-1.rds.amazonaws.com',
@@ -19,4 +22,10 @@ process.on('exit', () => {
   console.log('Connection to Database closed.');
 });
 
-module.exports = db;
+app.use(express.json());
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
