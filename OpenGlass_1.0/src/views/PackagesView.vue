@@ -15,17 +15,15 @@
                     </div>
                   </div>
                 </div>
-                <div v-if="selectedService && !selectedDrink" class="mt-6">
-                    <label for="specialDrinks" class="block mt-4 text-sm font-medium text-gray-700">Select a special drink:</label>
-                    <select id="specialDrinks" v-model="selectedDrink" class="mt-1 p-2 rounded-md shadow-sm">
-                        <option value="drink1">Special Drink 1</option>
-                        <option value="drink2">Special Drink 2</option>
-                        <option value="drink1">Special Drink 3</option>
-                        <option value="drink2">Special Drink 4</option>
-                        <option value="drink1">Special Drink 5</option>
-                    </select>
+                <div>{{ selectedDrink }}</div>
+                <div v-if="selectedService && selectedDrinks.length < selectedService.drinkLimit" class="mt-6">
+                  <label class="block mt-4 text-sm font-medium text-gray-700">Select a special drink:</label>
+                  <div v-for="(drink, index) in drinks" :key="index">
+                      <input type="checkbox" :id="drink.value" v-model="selectedDrinks" :value="drink.value">
+                      <label :for="drink.value" class="ml-2">{{ drink.name }}</label>
+                  </div>
                 </div>
-                <div v-if="selectedDrink && !selectedDate" class="mt-6">
+                <div v-if="selectedService && selectedDrinks.length === selectedService.drinkLimit && !selectedDate" class="mt-6">
                     <label for="date" class="block text-sm font-medium text-gray-700">Select a date:</label>
                     <input type="date" id="date" v-model="selectedDate" @change="selectDate(selectedDate)" class="mt-1 p-2 rounded-md shadow-sm">
                 </div>
@@ -35,10 +33,19 @@
                         <option value="10:00 AM">10:00 AM</option>
                         <option value="11:00 AM">11:00 AM</option>
                         <option value="12:00 PM">12:00 PM</option>
-                        <!-- Additional time slots can be added here -->
                     </select>
                 </div>
                 <div v-if="selectedTime" class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700">Enter your name for signature:</label>
+                    
+                    <!-- Display Mode -->
+                    <div v-if="!isEditing" @click="isEditing = true" class="mt-1 p-2 rounded-md shadow-sm border bg-white cursor-text placeholder-gray-400">
+                        <p v-if="signatureName" class="font-dancingScript text-xl">{{ signatureName }}</p>
+                        <p v-else class="text-gray-400">Click to sign</p>
+                    </div>
+                    
+                    <!-- Editing Mode -->
+                    <input v-if="isEditing" type="text" v-model="signatureName" @blur="isEditing = false" class="mt-1 p-2 rounded-md shadow-sm bg-white" placeholder="Type your name here" ref="signatureInput" />
                     <div>
                       <button @click="pay">pay</button>
                     </div>
@@ -49,7 +56,6 @@
   </template>
   
   <script>
-  import { loadStripe } from '@stripe/stripe-js';
   import { StripeCheckout } from '@vue-stripe/vue-stripe';
   import { StripeElement, StripeElements } from 'vue-stripe-js';
   export default {
@@ -59,17 +65,14 @@
         StripeElement,
     },
     data() {
-      this.publishableKey = 'pk_test_51NzUcaDluQCGRUuAxAWcXePqwfKCxcuA2uOI0cTMR9gmb9S0oOg1t1ZQSZMRROWli2y7xAmQmrQ3m65Y2MMZmOQ700lEBYclIb';
       return {
-        stripe: null,  // Stripe instance
-        stripeLoaded: false,
-        card: null,  // Card Element
-        loading: false,
-        lineItems: [
-            {
-                price: 'pi_3NzVTxDluQCGRUuA0XBjc3jd',
-                quantity: 1,
-            },
+        selectedDrinks: [],
+        drinks: [
+            {name: 'Special Drink 1', value: 'drink1'},
+            {name: 'Special Drink 2', value: 'drink2'},
+            {name: 'Special Drink 3', value: 'drink3'},
+            {name: 'Special Drink 4', value: 'drink4'},
+            {name: 'Special Drink 5', value: 'drink5'},
         ],
         services: [
             {
@@ -89,7 +92,8 @@
                     '- Setup and cleanup',
                     '*PACKAGE DOES NOT INCLUDE ALCOHOL'
                 ],
-                image: '/simple_glass.png'
+                image: '/simple_glass.png',
+                drinkLimit: 2
             },
             {
                 title: 'PREMIUM GLASS',
@@ -114,7 +118,8 @@
                   '- Setup and cleanup',
                   '*PACKAGE DOES NOT INCLUDE ALCOHOL'
                 ],
-                image: '/premium_glass.png'
+                image: '/premium_glass.png',
+                drinkLimit: 3
             },
             {
                 title: 'SIGNATURE GLASS',
@@ -140,7 +145,8 @@
                   '- Setup and cleanup',
                   '*PACKAGE DOES NOT INCLUDE ALCOHOL'
                 ],
-                image: '/signature_glass.png'
+                image: '/signature_glass.png',
+                drinkLimit: 5
             },
             {
                 title: 'THE "OPEN GLASS"',
@@ -162,7 +168,8 @@
                   'provide you with a customized',
                   'quote.'
                 ],
-                image: '/open_glass.png'
+                image: '/open_glass.png',
+                drinkLimit: 5
             }
         ],
 
@@ -170,14 +177,22 @@
         selectedDate: null,
         selectedTime: null,
         selectedDrink: null,
+        signatureName: '',
+        isEditing: false,
       };
+    },
+    watch: {
+        isEditing: function(newVal) {
+            if (newVal) {
+                this.$nextTick(() => {
+                    this.$refs.signatureInput.focus();
+                });
+            }
+        }
     },
     methods: {
       submit () {
         this.$refs.checkoutRef.redirectToCheckout();
-      },
-      selectService(service) {
-        this.selectedService = service;
       },
       selectDate(date) {
         this.selectedDate = date;
@@ -194,104 +209,34 @@
         this.selectedDate = null;
         this.selectedTime = null;
       },
+      selectService(service) {
+          this.selectedService = service;
+          this.selectedDrinks = [];
+      },
       pay() {
-        window.location.href = 'https://buy.stripe.com/test_9AQ6p99Il8rLfYY144';
-      },
-      createPaymentIntent() {
-        fetch('https://mud-honey-coast.glitch.me/create-payment-intent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({"selectedService": "some-service"}),
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log('CJ got good payment:')
-          this.resetSelection();
-          if (data.clientSecret) {
-            // Step 2: Handle the payment on the client
-            console.log('Payment good:', data.clientSecret)
-            this.handlePayment(data.clientSecret);
-          } else {
-            console.error('Payment failed:', data.message);
+          let paymentUrl = '';
+
+          switch (this.selectedService.title) {
+              case 'PREMIUM GLASS':
+                  paymentUrl = 'https://buy.stripe.com/test_5kA4h18EhbDXbIIcMO';
+                  break;
+              case 'SIGNATURE GLASS':
+                  paymentUrl = 'https://buy.stripe.com/test_cN28xh9IleQ9dQQ5kn';
+                  break;
+              case 'THE "OPEN GLASS"':
+                  paymentUrl = 'https://buy.stripe.com/test_eVaeVFf2FgYh288bIM';
+                  break;
+              default:
+                  paymentUrl = 'https://buy.stripe.com/test_9AQ00L7Ad5fz6oo6op';
+                  break;
           }
-        })
-        .catch(error => {
-          console.error('Fetch error:', error.message);
-        });
-      },
-    },
-    async loadStripe() {
-      const stripeInstance = await loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
-      this.stripe = stripeInstance;
-      this.stripeLoaded = true;
-    },
-    pay() {
-        this.processPayment(result.token);
-        if (this.card) {
-            this.stripe.createToken(this.card).then(result => {
-            if (result.error) {
-                // Handle error in your UI.
-                console.error(result.error.message);
-            } else {
-                // Send the token to your server.
-                this.processPayment(result.token);
-            }
-            });
-        }
-    },
-    processPayment(token) {
-        fetch('https://mud-honey-coast.glitch.me/create-payment-intent', {  // Update the URL to your server
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"selectedService": "some-service"}),
-        })
-        .then(response => response.json())
-        .then(data => {
-        if (data.success) {
-            // Handle successful payment
-            console.log('Payment successful:', data);
-        } else {
-            // Handle failed payment
-            console.error('Payment failed:', data.message);
-        }
-        })
-        .catch(error => {
-        // Handle fetch error
-        console.error('Fetch error:', error.message);
-        });
-    },
-    
-    handlePayment(clientSecret) {
-      const elements = this.stripe.elements();
-      const cardElement = elements.create('card');
 
-      cardElement.mount('#card-element');  // Assumes you have a div with id="card-element" where the card Element will be mounted
-
-      this.stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            // Include any additional collected billing details
-          },
-        },
-      })
-      .then(result => {
-        if (result.error) {
-          console.error(result.error.message);
-        } else {
-          // The payment succeeded!
-          console.log('Payment succeeded:', result.paymentIntent.id);
-        }
-      });
+          window.location.href = paymentUrl;
+      }
     },
   };
   </script>
   
-  <style scoped>
-  /* If you have any styles specific to this component, place them here. */
-  </style>
-  
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap');
+</style>
