@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const app = express();
 
@@ -17,15 +17,17 @@ db.connect((err) => {
   console.log('Connected to Database Successful!');
 });
 
-process.on('exit', () => {
-  db.end();
-  console.log('Connection to Database closed.');
-});
-
 app.use(express.json());
+
+const usersRoutes = require('./routes/users');
+usersRoutes({ app, db });
+
+const packageRoutes = require('./routes/packages');
+packageRoutes({ app, db });
 
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
