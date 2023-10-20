@@ -25,6 +25,9 @@ usersRoutes({ app, db });
 const packageRoutes = require('./routes/packages');
 packageRoutes({ app, db });
 
+const menuRoutes = require('./routes/menu');
+menuRoutes({ app, db });
+
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
