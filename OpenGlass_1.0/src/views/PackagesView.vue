@@ -36,6 +36,11 @@
                     </select>
                 </div>
                 <div v-if="selectedTime" class="mt-6">
+                    <!-- PDF View Button -->
+                    <button @click="viewPDF" class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        View PDF
+                    </button>
+
                     <label class="block text-sm font-medium text-gray-700">Enter your name for signature:</label>
                     
                     <!-- Display Mode -->
@@ -212,6 +217,9 @@
       selectService(service) {
           this.selectedService = service;
           this.selectedDrinks = [];
+      },
+      viewPDF() {
+          window.open('/service_agreement.pdf', '_blank');
       },
       pay() {
           let paymentUrl = '';
