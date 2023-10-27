@@ -12,16 +12,16 @@ module.exports = ({ app, db }) => {
         });
     });
 
+    //gets all of the drinks information including the alcohol bases and inventory ingredients and organizes the json response to eliminate repeats of alc or inv and places them into arrays
     app.get('/admin/drinks', (req, res) => {
-      const selectQuery = `SELECT d.drink_id, d.drink_name, d.drink_type, d.drink_description,
+      const selectQuery = `SELECT d.drink_id, d.drink_name, d.drink_type, d.drink_description, d.drink_status,
       a.alcohol_name, a.alcohol_type,
       i.inventory_name, i.inventory_type
       FROM Drinks d
       INNER JOIN Alcohol_Drinks ad ON d.drink_id = ad.drink_id
       INNER JOIN Alcohol a ON ad.alcohol_id = a.alcohol_id
       INNER JOIN Inventory_Drinks id ON d.drink_id = id.drink_id
-      INNER JOIN Inventory i ON id.inventory_id = i.inventory_id
-      WHERE d.drink_status = 'Active';`
+      INNER JOIN Inventory i ON id.inventory_id = i.inventory_id;`
       db.query(selectQuery, (error, results) => {
           if (error) {
             console.log(error);
@@ -35,6 +35,7 @@ module.exports = ({ app, db }) => {
                 drink_name: row.drink_name,
                 drink_type: row.drink_type,
                 drink_description: row.drink_description,
+                drink_status: row.drink_status,
                 alcohol: [],
                 inventory: []
               };
@@ -193,7 +194,7 @@ module.exports = ({ app, db }) => {
       });
 
   
-      //update the drinks name, type, or description
+    //update the drinks name, type, description, alcohol bases, or ingredients
     app.put('/updateDrink/:drink_id', (req, res) => {
       const { name, type, desc, alcohol, ingredients} = req.body;
       const drink_id = req.params.drink_id;
@@ -403,5 +404,64 @@ module.exports = ({ app, db }) => {
 
         return res.status(200).json({ message: 'Drink deleted from the menu successfully.' });
       });
+   });
+
+   //user can delete the relationships between a drink and the bases or invgredients one at a time so the alcohol item or inventory item can then be deleted on other pages of app
+   app.delete('/deletedrinkrelationship/:drink_id', (req, res)=> {
+    const drink_id = req.params.drink_id;
+    const alcohol_name = req.body.alcohol_name;
+    const inventory_name = req.body.inventory_name;
+
+    if (!alcohol_name && !inventory_name) {
+      return res.status(400).json({ message: 'Please provide either the alcohol_name or inventory_name to delete its relationship with the drink.' });
+    }
+
+    if (alcohol_name && inventory_name) {
+      return res.status(400).json({ message: 'Can only delete one relationship at a time please enter either the alcohol_name or inventory_name to delete its relationship with the drink.' });
+    }
+    
+    const deleteRelationship = (type, type_id, type_name, value, callback) => {
+      const searchQuery = `SELECT ${type_id} FROM ${type} WHERE ${type_name} = ?`;
+
+      db.query(searchQuery, [value], (error, results) => {
+        if (error) {
+          return res.status(500).json({ message: `Error searching for ${type_id} based on ${type_name} given.` });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({ message: `${type} item not found based on ${type_name} given.` });
+        }
+
+        let typeID = '';
+        if (type_id === 'alcohol_id') {
+          typeID = results[0].alcohol_id;
+        }
+        if (type_id === 'inventory_id') {
+          typeID = results[0].inventory_id;
+        }
+
+        const deleteRelationshipQuery = `DELETE FROM ${type}_Drinks WHERE drink_id = ? AND ${type_id} = ?`;
+
+        db.query(deleteRelationshipQuery, [drink_id, typeID], (error) => {
+          if (error) {
+            return res.status(500).json({ message: `Error deleting the relationship in ${type}_drinks` });
+          }
+          callback();
+        });
+      });
+    };
+
+    if (alcohol_name) {
+      deleteRelationship('Alcohol', 'alcohol_id', 'alcohol_name', alcohol_name, () => {
+        return res.status(200).json({ message: 'Alcohol relationship successfully deleted in the Alcohol_Drinks relationship table.' });
+      });
+    }
+
+    if (inventory_name) {
+      deleteRelationship('Inventory', 'inventory_id', 'inventory_name', inventory_name, () => {
+        return res.status(200).json({ message: 'Inventory relationship successfully deleted in the Inventory_Drinks relationship table.' });
+      });
+    }
+
    });
 };
