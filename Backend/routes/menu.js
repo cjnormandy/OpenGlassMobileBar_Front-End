@@ -21,7 +21,7 @@ module.exports = ({ app, db }) => {
       INNER JOIN Alcohol_Drinks ad ON d.drink_id = ad.drink_id
       INNER JOIN Alcohol a ON ad.alcohol_id = a.alcohol_id
       INNER JOIN Inventory_Drinks id ON d.drink_id = id.drink_id
-      INNER JOIN Inventory i ON id.inventory_id = i.inventory_id;`
+      INNER JOIN Inventory i ON id.inventory_id = i.inventory_id;`;
       db.query(selectQuery, (error, results) => {
           if (error) {
             console.log(error);
