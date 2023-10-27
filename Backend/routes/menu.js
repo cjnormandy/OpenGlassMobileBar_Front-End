@@ -147,77 +147,216 @@ module.exports = ({ app, db }) => {
         }
       });
 
-
+  
       //update the drinks name, type, or description
-      app.put('/updateDrink/:drink_id', (req, res) => {
-        const { name, type, desc, } = req.body;
-        const drink_id = req.params.drink_id;
+    app.put('/updateDrink/:drink_id', (req, res) => {
+      const { name, type, desc, alcohol, ingredients} = req.body;
+      const drink_id = req.params.drink_id;
+      let updatedFields = '';
 
-        if (!name && !type && !desc) {
-            return res.status(400).json({ message: 'At least one of the fields are required to update a drink in the menu.' });
-        }
+      if (!name && !type && !desc && !alcohol && !ingredients) {
+        return res.status(400).json({ message: 'No fields provided for update!' })
+      }
 
-        let updateQuery = 'UPDATE Drinks SET ';
-        const values = [];
+      if (name || type || desc) {
+        if (name) updatedFields += 'drink_name = ?, ';
+        if (type) updatedFields += 'drink_type = ?, ';
+        if (desc) updatedFields += 'drink_description = ?, ';
 
-        if (name) {
-            updateQuery += 'drink_name = ?, ';
-            values.push(name);
-        }
+        updatedFields = updatedFields.slice(0, -2);
 
-        if (type) {
-            updateQuery += 'drink_type = ?, ';
-            values.push(type);
-        }
+        const updateDrinkQuery = `UPDATE Drinks SET ${updatedFields} WHERE drink_id = ?`;
+        const updateDrinkValues = [];
 
-        if (desc) {
-            updateQuery += 'drink_description = ?, ';
-            values.push(desc);
-        }
+        if (name) updateDrinkValues.push(name);
+        if (type) updateDrinkValues.push(type);
+        if (desc) updateDrinkValues.push(desc);
 
-        updateQuery = updateQuery.slice(0, -2);
+        updateDrinkValues.push(drink_id);
 
-        updateQuery += ' WHERE drink_id = ?';
-        values.push(drink_id);
+        db.query(updateDrinkQuery, updateDrinkValues, (error) => {
+          if (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Error updating the drink in the menu.' });
+          }
+        });
+      }
 
-        db.query(updateQuery, values, (error, results) => {
-            if (error) {
-              console.log(error);
-              return res.status(500).json({ message: 'Error updating drink in the menu.' });
-            }
-
-            if (results.affectedRows === 0) {
-                return res.status(404).json({ message: 'Drink was not found in the menu.' });
-            }
-
-            return res.status(200).json({ message: 'Drink updated in the menu successfully.' });
+      if (alcohol || ingredients) {
+        if (alcohol && ingredients) {
+          processUpAlc(alcohol, drink_id, () => {
+            processUpInv(ingredients, drink_id, () => {
+              return res.status(200).json({ message: 'Drink updated successfully in the menu.'});
+            });
           });
-      });
-
-
-      //instead of deleting the drink this sets it's status to inactive and it will no longer be displayed on the drink menu
-      app.put('/deleteDrink/:drink_id', (req, res) => {
-        const drink_id = req.params.drink_id;
-        let deleteQuery = 'UPDATE Drinks SET drink_status = ?';
-        const values = [];
-
-        const inactive_status = 'Inactive';
-        values.push(inactive_status);
-
-        deleteQuery += ' WHERE drink_id = ?';
-        values.push(drink_id);
-
-        db.query(deleteQuery, values, (error, results) => {
-            if (error) {
-              console.log(error);
-              return res.status(500).json({ message: 'Error deleting drink from the menu.' });
-            }
-
-            if (results.affectedRows === 0) {
-                return res.status(404).json({ message: 'Drink was not found in the menu.' });
-            }
-
-            return res.status(200).json({ message: 'Drink deleted from the menu successfully.' });
+        }
+        if (alcohol && !ingredients) {
+          processUpAlc(alcohol, drink_id, () =>{
+            return res.status(200).json({ message: 'Drink updated successfully in the menu.'});
           });
+        }
+        if (!alcohol && ingredients) {
+          processUpInv(ingredients, drink_id, () =>{
+            return res.status(200).json({ message: 'Drink updated successfully in the menu.'});
+          });
+        }
+      }
+      else {
+        return res.status(200).json({ message: 'Drink updated successfully in the menu.'});
+      }
+
+      
+
+      function processUpAlc(alcoholList, drinkID, callback) {
+        //console.log(drinkID);
+        function processUpAItem(index) {
+          if (index >= alcoholList.length) {
+            callback();
+          }
+          else {
+            const alcData = alcoholList[index];
+            const getAlcQuery = 'SELECT * FROM Alcohol WHERE alcohol_name = ? AND alcohol_type = ?';
+
+            db.query(getAlcQuery, [alcData.name, alcData.type], (error, existAlc) => {
+              if (error) {
+                return res.status(500).json({ message: 'Error checking if the alcohol used in the drink exists in the database.'});
+              }
+
+              if (existAlc.length > 0) {
+                const alcID = existAlc[0].alcohol_id;
+                //console.log(alcID);
+                upAlcRelationship(drinkID, alcID, () => {
+                  processUpAItem(index + 1);
+                });
+              }
+              else {
+                const addAlcQuery = 'INSERT INTO Alcohol (alcohol_name, alcohol_type) VALUES (?, ?)';
+                db.query(addAlcQuery, [alcData.name, alcData.type], (error, newAlc) => {
+                  if (error) {
+                    return res.status(500).json({ message: 'Error adding a new alcohol to the database.'});
+                  }
+                  const alcID = newAlc.insertId;
+                  //console.log(alcID);
+                  upAlcRelationship(drinkID, alcID, () => {
+                    processUpAItem(index + 1);
+                  });
+                });
+              }
+            });
+          }
+        }
+
+        processUpAItem(0);
+      }
+
+      function processUpInv(invList, drinkID, callback) {
+        //console.log(drinkID);
+        function processUpInItem(index) {
+          if (index >= invList.length) {
+            callback();
+          }
+          else {
+            const invData = invList[index];
+            const getInvQuery = 'SELECT * FROM Inventory WHERE inventory_name = ? AND inventory_type = ?';
+
+            db.query(getInvQuery, [invData.name, invData.type], (error, existInv) => {
+              if (error) {
+                return res.status(500).json({ message: 'Error checking if the ingredient used in the drink exists in the database.'});
+              }
+
+              if (existInv.length > 0) {
+                const invID = existInv[0].inventory_id;
+                upInvRelationship(drinkID, invID, () => {
+                  processUpInItem(index + 1);
+                });
+              }
+              else {
+                const addInvQuery = 'INSERT INTO Inventory (inventory_name, inventory_type, inventory_quantity) VALUES (?, ?, ?)';
+                const zero = 0;
+                db.query(addInvQuery, [invData.name, invData.type, zero], (error, newInv) => {
+                  if (error) {
+                    return res.status(500).json({ message: 'Error adding a new ingredient to the database.'});
+                  }
+                  const invID = newInv.insertId;
+                  upInvRelationship(drinkID, invID, () => {
+                    processUpInItem(index + 1);
+                  });
+                });
+              }
+            });
+          }
+        }
+
+        processUpInItem(0);
+      }
+
+      function upAlcRelationship(drinkID, alcID, callback) {
+        const selAlcRelationQuery = 'SELECT * FROM Alcohol_Drinks WHERE drink_id = ? AND alcohol_id = ?';
+        db.query(selAlcRelationQuery, [drinkID, alcID], (error, existAlcRel)=> {
+          if (error) {
+            return res.status(500).json({ message: 'Error checking drink-alcohol relationship existence' });
+          }
+          //console.log(existAlcRel.length);
+
+          if (existAlcRel.length === 0) {
+            const updateAlcRelationQuery = 'INSERT INTO Alcohol_Drinks (drink_id, alcohol_id) VALUES (?, ?)';
+            db.query(updateAlcRelationQuery, [drinkID, alcID], (error)=> {
+              if (error) {
+                console.log(error);
+                return res.status(500).json({ message: 'Error updating the relationship between drink and alcohol.'});
+              }
+            });
+          }
+          callback();
+        });
+      }
+
+      function upInvRelationship(drinkID, invID, callback) {
+        const selInvRelationQuery = 'SELECT * FROM Inventory_Drinks WHERE drink_id = ? AND inventory_id = ?';
+        db.query(selInvRelationQuery, [drinkID, invID], (error, existInvRel)=> {
+          if(error) {
+            return res.status(500).json({ message: 'Error checking drink-ingredient relationship existence' });
+          }
+          //console.log(existInvRel.length);
+
+          if(existInvRel.length === 0) {
+            const updateInvRelationQuery = 'INSERT INTO Inventory_Drinks (drink_id, inventory_id) VALUES (?, ?)';
+            db.query(updateInvRelationQuery, [drinkID, invID], (error) => {
+              if (error) {
+                console.log(error);
+                return res.status(500).json({ message: 'Error updating the relationship between drink and ingredient.'});
+              }
+            });
+          }
+          callback();
+        });
+      }
+    });
+
+
+    //instead of deleting the drink this sets it's status to inactive and it will no longer be displayed on the drink menu
+    app.put('/deleteDrink/:drink_id', (req, res) => {
+      const drink_id = req.params.drink_id;
+      let deleteQuery = 'UPDATE Drinks SET drink_status = ?';
+      const values = [];
+
+      const inactive_status = 'Inactive';
+      values.push(inactive_status);
+
+      deleteQuery += ' WHERE drink_id = ?';
+      values.push(drink_id);
+
+      db.query(deleteQuery, values, (error, results) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).json({ message: 'Error deleting drink from the menu.' });
+        }
+
+        if (results.affectedRows === 0) {
+          return res.status(404).json({ message: 'Drink was not found in the menu.' });
+        }
+
+        return res.status(200).json({ message: 'Drink deleted from the menu successfully.' });
       });
-  };
+   });
+};
