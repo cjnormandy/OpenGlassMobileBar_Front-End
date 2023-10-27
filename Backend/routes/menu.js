@@ -12,6 +12,51 @@ module.exports = ({ app, db }) => {
         });
     });
 
+    app.get('/admin/drinks', (req, res) => {
+      const selectQuery = `SELECT d.drink_id, d.drink_name, d.drink_type, d.drink_description,
+      a.alcohol_name, a.alcohol_type,
+      i.inventory_name, i.inventory_type
+      FROM Drinks d
+      INNER JOIN Alcohol_Drinks ad ON d.drink_id = ad.drink_id
+      INNER JOIN Alcohol a ON ad.alcohol_id = a.alcohol_id
+      INNER JOIN Inventory_Drinks id ON d.drink_id = id.drink_id
+      INNER JOIN Inventory i ON id.inventory_id = i.inventory_id
+      WHERE d.drink_status = 'Active';`
+      db.query(selectQuery, (error, results) => {
+          if (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Internal server error' });
+          }
+          const drinks = [];
+          results.forEach((row)=> {
+            if (!drinks[row.drink_id]) {
+              drinks[row.drink_id] = {
+                drink_id: row.drink_id,
+                drink_name: row.drink_name,
+                drink_type: row.drink_type,
+                drink_description: row.drink_description,
+                alcohol: [],
+                inventory: []
+              };
+            }
+            if (row.alcohol_name && !drinks[row.drink_id].alcohol.some((a) => a.alcohol_name === row.alcohol_name)) {
+              drinks[row.drink_id].alcohol.push({
+                alcohol_name: row.alcohol_name,
+                alcohol_type: row.alcohol_type
+              });
+            }
+            if (row.inventory_name && !drinks[row.drink_id].inventory.some((i) => i.inventory_name === row.inventory_name)) {
+              drinks[row.drink_id].inventory.push({
+                inventory_name: row.inventory_name,
+                inventory_type: row.inventory_type
+              });
+            }
+          });
+          const resultArr = Object.values(drinks);
+          return res.status(200).json(resultArr);
+        });
+    });
+
 
     /*creates a drink in the drinks table and checks to see if the alcohol name and type provided are in the alcohol table then it create a new relationship
     between the drink and alcohol by id in the alcohol_drinks table, if the alcohol name and type is not in the alcohol table it will create a new alcohol entry with the name and type
