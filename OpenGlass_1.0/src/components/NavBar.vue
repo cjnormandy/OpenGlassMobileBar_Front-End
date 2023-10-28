@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Dialog, DialogPanel } from '@headlessui/vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { useAuthStore } from '../store/auth';
 
 const navigation = [
   { name: 'About Us', href: '/about'},
@@ -13,6 +14,8 @@ const navigation = [
   { name: 'FAQ', href: '/faq' },  
 ]
 
+const auth = useAuthStore();
+const isAuthenticated = computed(() => auth.isAuthenticated);
 const mobileMenuOpen = ref(false)
 </script>
 
@@ -33,6 +36,7 @@ const mobileMenuOpen = ref(false)
         </div>
         <div class="hidden lg:flex lg:gap-x-12">
           <a v-for="item in navigation" :key="item.name" :href="item.href" class="text-sm font-semibold leading-6 text-gray-900">{{ item.name }}</a>
+          <a href="/orders" v-if="isAuthenticated" class="text-sm font-semibold leading-6 text-gray-900">Orders</a>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
           <a href="/login" class="text-sm font-semibold leading-6 text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>

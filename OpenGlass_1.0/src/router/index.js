@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../store/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,11 +51,18 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
+      path: '/orders',
+      name: 'orders',
+      component: () => import('../views/OrdersView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/faq',
       name: 'faq',
       component: () => import('../views/FAQView.vue')
     }
   ]
 })
+
 
 export default router
