@@ -5,7 +5,6 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '../store/auth';
 
 const navigation = [
-  { name: 'Gallery', href: '/home'},
   { name: 'Menu', href: '/menu' },
   { name: 'Services', href: '/services' },
   { name: 'Packages', href: '/packages' },
