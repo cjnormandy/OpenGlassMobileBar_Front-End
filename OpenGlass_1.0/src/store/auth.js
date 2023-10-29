@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
+import axios from 'axios';
 
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
     user: null,
+    token: null,
   }),
   getters: {
     isAuthenticated() {
@@ -12,14 +14,21 @@ export const useAuthStore = defineStore({
     }
   },
   actions: {
-    login(email, password) {
-        const staticUser = 'test@test.com';
-        const staticPassword = 'pass';
-        if (email === staticUser && password === staticPassword) {
-            this.user = { email };
-            return true;
-        } else {
-            return false;
+    async login(email, password) {
+        try {
+            const response = await axios.post('http://localhost:3000/users/login', {
+                username: email,  // Assuming the backend expects a field named 'username'
+                password: password,
+            });
+            
+            // Assuming a successful login will return a token in the response body
+            this.user = { email };  // Update the user state
+            this.token = response.data.token;  // Update the token state
+
+            return true;  // Login successful
+        } catch (error) {
+            console.error('Login failed:', error.response ? error.response.data : error.message);
+            return false;  // Login failed
         }
     },
   },
