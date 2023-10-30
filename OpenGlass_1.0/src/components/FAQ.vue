@@ -4,7 +4,7 @@
       <div v-for="(item, index) in faqItems" :key="index">
         <div @click="toggleAccordion(index)" class="bg-gray-100 p-4 mt-4 cursor-pointer">
           <div class="flex justify-between items-center">
-            <div class="text-lg">{{ item.question }}</div>
+            <div class="text-lg font-semibold">{{ item.question }}</div>
             <div v-if="item.open" class="transform rotate-180">
               &#x25B2;
             </div>
