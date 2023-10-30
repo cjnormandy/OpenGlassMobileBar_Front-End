@@ -53,7 +53,7 @@ module.exports = ({ app, db }) => {
   });
 
   // Delete a service by ID
-  app.delete('/DeleteSerices/:id', (req, res) => {
+  app.delete('/DeleteServices/:id', (req, res) => {
     const id = req.params.id;
     const deleteQuery = 'DELETE FROM Services WHERE service_id=?';
 
