@@ -6,9 +6,7 @@ import { useAuthStore } from '../store/auth';
 
 const navigation = [
   { name: 'Menu', href: '/menu' },
-  { name: 'Services', href: '/services' },
   { name: 'Packages', href: '/packages' },
-  { name: 'Calendar', href: '/calendar' },
   { name: 'About Us', href: '/about'},
   { name: 'FAQ', href: '/faq' },  
 ]

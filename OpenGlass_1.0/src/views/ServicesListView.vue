@@ -1,13 +1,31 @@
 <template>
-    <div class="bg-white py-24 sm:py-32">
+  <div class="absolute inset-x-0 top-40 z-1">
+    <!-- Jumbotron -->
+    <div class="relative overflow-hidden bg-cover bg-no-repeat bg-center p-12 text-center" style="background-image: url('/pack_img1.png'); padding-bottom: 20%;"> 
+        <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-fixed" style="background-color: rgba(0, 0, 0, 0.6)">
+            <div class="flex h-full items-center justify-center">
+                <div class="text-white">
+                  <h2 class="mb-4 text-4xl font-semibold">Packages</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Jumbotron -->
+    <div v-if="!selectedService">
+      <div class="font-semibold text-3xl py-4 text-gray-500 hover:text-gray-600">
+        Select a Package
+      </div>
+      <p class="text-base text-gray-900">"Every event is unique, which is why we provide flexible pricing options!"</p>
+    </div>
+    <div class="py-2">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="p-8">
+        <div class="">
           <swiper @swiper="onSwiper" :options="swiperOptions" ref="mySwiper" v-if="!selectedService" class="carousel-card">
             <swiper-slide v-for="service in services" :key="service.title">
               <service-card :service="service" @selectService="selectService"></service-card>
             </swiper-slide>
           </swiper>
-          <div v-if="!selectedService" class="button-container flex justify-between">
+          <div v-if="!selectedService" class="button-container flex justify-between p-2">
             <button v-for="pkg in packages" :key="pkg" @click="selectPackage(pkg)" class="btn">{{ pkg }}</button>
           </div>
           <div>{{ selectedDrink }}</div>
@@ -48,7 +66,8 @@
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
   import { ref, onMounted } from 'vue';
