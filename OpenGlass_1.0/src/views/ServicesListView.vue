@@ -7,7 +7,7 @@
               <service-card :service="service" @selectService="selectService"></service-card>
             </swiper-slide>
           </swiper>
-          <div class="button-container flex justify-between">
+          <div v-if="!selectedService" class="button-container flex justify-between">
             <button v-for="pkg in packages" :key="pkg" @click="selectPackage(pkg)" class="btn">{{ pkg }}</button>
           </div>
           <div>{{ selectedDrink }}</div>
