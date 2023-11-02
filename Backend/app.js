@@ -28,6 +28,12 @@ menuRoutes({ app, db });
 const inventoryRoutes = require('./routes/inventory');
 inventoryRoutes({ app, db });
 
+const invoiceRoutes = require('./routes/invoices');
+invoiceRoutes({ app, db });
+
+const supplierRoutes = require('./routes/suppliers');
+supplierRoutes({ app, db });
+
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
