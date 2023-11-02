@@ -21,7 +21,7 @@ const router = createRouter({
     {
       path: '/packages',
       name: 'packages',
-      component: () => import('../views/PackagesView.vue')
+      component: () => import('../views/ServicesListView.vue')
     },
     {
       path: '/home',
@@ -50,11 +50,18 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
+      path: '/orders',
+      name: 'orders',
+      component: () => import('../views/OrdersView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/faq',
       name: 'faq',
       component: () => import('../views/FAQView.vue')
     }
   ]
 })
+
 
 export default router

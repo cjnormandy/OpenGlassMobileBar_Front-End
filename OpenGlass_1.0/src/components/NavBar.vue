@@ -1,18 +1,18 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Dialog, DialogPanel } from '@headlessui/vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { useAuthStore } from '../store/auth';
 
 const navigation = [
-  { name: 'About Us', href: '/about'},
-  { name: 'Gallery', href: '/home'},
   { name: 'Menu', href: '/menu' },
-  { name: 'Services', href: '/services' },
   { name: 'Packages', href: '/packages' },
-  { name: 'Calendar', href: '/calendar' },
+  { name: 'About Us', href: '/about'},
   { name: 'FAQ', href: '/faq' },  
 ]
 
+const auth = useAuthStore();
+const isAuthenticated = computed(() => auth.isAuthenticated);
 const mobileMenuOpen = ref(false)
 </script>
 
@@ -22,17 +22,18 @@ const mobileMenuOpen = ref(false)
         <div class="flex lg:flex-1">
           <a href="/" class="-m-1.5 p-1.5">
             <span class="sr-only">Open Glass</span>
-            <img alt="Open Glass logo" class="logo" src="../assets/openg_logo.png" width="200" height="200" />
+            <img alt="Open Glass logo" class="logo" src="../assets/openg_logo_v2.png" width="150" height="150" />
           </a>
         </div>
         <div class="flex lg:hidden">
-          <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = true">
+          <button type="button" class="inline-flex items-center justify-center rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = true">
             <span class="sr-only">Open main menu</span>
             <Bars3Icon class="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
         <div class="hidden lg:flex lg:gap-x-12">
           <a v-for="item in navigation" :key="item.name" :href="item.href" class="text-sm font-semibold leading-6 text-gray-900">{{ item.name }}</a>
+          <a href="/orders" v-if="isAuthenticated" class="text-sm font-semibold leading-6 text-gray-900">Orders</a>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
           <a href="/login" class="text-sm font-semibold leading-6 text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>
@@ -44,7 +45,7 @@ const mobileMenuOpen = ref(false)
           <div class="flex items-center justify-between">
             <a href="#" class="-m-1.5 p-1.5">
               <span class="sr-only">Your Company</span>
-              <img alt="Open Glass logo" class="logo" src="../assets/openg_logo.png" width="200" height="200" />
+              <img alt="Open Glass logo" class="logo" src="../assets/openg_logo_v2.png" width="150" height="150" />
             </a>
             <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
               <span class="sr-only">Close menu</span>
@@ -55,6 +56,7 @@ const mobileMenuOpen = ref(false)
             <div class="-my-6 divide-y divide-gray-500/10">
               <div class="space-y-2 py-6">
                 <a v-for="item in navigation" :key="item.name" :href="item.href" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">{{ item.name }}</a>
+                <a href="/orders" v-if="isAuthenticated" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Orders</a>
               </div>
               <div class="py-6">
                 <a href="/login" class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Log in</a>

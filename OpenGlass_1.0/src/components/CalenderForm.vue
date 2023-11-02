@@ -70,7 +70,7 @@ const calculatedResults = computed(() => {
 </script>
 
 <template>
-    <div class="absolute inset-x-10 top-40 z-1">
+    <div class="absolute inset-x-0 top-40 z-1">
         <!-- Jumbotron -->
         <div class="relative overflow-hidden rounded-lg bg-cover bg-no-repeat bg-center p-12 text-center" style="background-image: url('src/assets/calender_photo.png'); padding-bottom: 26.25%;"> 
             <!-- This padding value of 56.25% gives a 16:9 aspect ratio. Adjust as needed. -->
