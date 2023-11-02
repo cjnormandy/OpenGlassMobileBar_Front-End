@@ -3,7 +3,7 @@
       <!-- Date Picker -->
       <div class="w-full md:w-1/2">
           <label for="date" class="block text-sm font-medium text-gray-700">Select a date:</label>
-          <!-- <v-date-picker elevation="24"></v-date-picker> -->
+          <vue-tailwind-datepicker v-model="dateValue" no-input />
           <input type="date" id="date" :value="selectedDate" @change="selectDate($event)" class="mt-1 p-2 rounded-md shadow-sm w-full">
       </div>
 
@@ -20,6 +20,9 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+
+const dateValue = ref([])
 export default {
   data() {
       return {
