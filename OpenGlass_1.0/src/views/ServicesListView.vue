@@ -32,14 +32,12 @@
           <div v-if="selectedService && selectedDrinks.length < selectedService.drinkLimit" class="mt-6">
             <label class="block mt-4 text-sm font-medium text-gray-700">Select a special drink:</label>
             <!-- Drink Checkboxes -->
-            <drink-checkbox
-              v-for="(drink, index) in drinks"
-              :key="index"
-              :drink="drink"
+            <drink-card
+              :drinks="drinks"
               :selectedDrinks="selectedDrinks"
               @addDrink="addDrink"
               @removeDrink="removeDrink"
-            ></drink-checkbox>
+            ></drink-card>
           </div>
 
           <div v-if="selectedService && selectedDrinks.length === selectedService.drinkLimit && !selectedTime" class="mt-6">
@@ -72,7 +70,7 @@
   <script>
   import { ref, onMounted } from 'vue';
   import ServiceCard from '../components/PackagesView/ServiceCard.vue';
-  import DrinkCheckbox from '../components/PackagesView/DrinkCheckbox.vue';
+  import DrinkCard from '../components/PackagesView/DrinkCard.vue';
   import DateTimePicker from '../components/PackagesView/DateTimePicker.vue';
   import SignatureInput from '../components/PackagesView/SignatureInput.vue';
   
@@ -82,7 +80,7 @@
   export default {
     components: {
       ServiceCard,
-      DrinkCheckbox,
+      DrinkCard,
       DateTimePicker,
       SignatureInput,
       Swiper,
@@ -117,11 +115,11 @@
         // packages: ['Package 1', 'Package 2', 'Package 3', 'Package 4'],
         selectedDrinks: [],
         drinks: [
-            {name: 'Special Drink 1', value: 'drink1'},
-            {name: 'Special Drink 2', value: 'drink2'},
-            {name: 'Special Drink 3', value: 'drink3'},
-            {name: 'Special Drink 4', value: 'drink4'},
-            {name: 'Special Drink 5', value: 'drink5'},
+            {name: 'Tropical Fusion', value: 'drink1',image: '/tropical_fusion.png'},
+            {name: 'Tamarind Echo', value: 'drink2',image: '/tamarind_echo.png'},
+            {name: 'Guava Groove', value: 'drink3',image: '/guava_groove.png'},
+            {name: 'Fruitful Vino', value: 'drink4',image: '/fruitful_vino.png'},
+            {name: 'Pineapple Serenade', value: 'drink5',image: '/pineapple_serenade.png'},
         ],
         services: [
             {
