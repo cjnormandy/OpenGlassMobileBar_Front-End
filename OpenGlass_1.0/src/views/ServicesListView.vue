@@ -31,7 +31,7 @@
           <div>{{ selectedDrink }}</div>
           <div v-if="selectedService && selectedDrinks.length < selectedService.drinkLimit" class="mt-6">
             <label class="block mt-4 text-sm font-medium text-gray-700">Select a special drink:</label>
-            <!-- Drink Checkboxes -->
+            <!-- Drink Cards -->
             <drink-card
               :drinks="drinks"
               :selectedDrinks="selectedDrinks"
@@ -115,11 +115,36 @@
         // packages: ['Package 1', 'Package 2', 'Package 3', 'Package 4'],
         selectedDrinks: [],
         drinks: [
-            {name: 'Tropical Fusion', value: 'drink1',image: '/tropical_fusion.png'},
-            {name: 'Tamarind Echo', value: 'drink2',image: '/tamarind_echo.png'},
-            {name: 'Guava Groove', value: 'drink3',image: '/guava_groove.png'},
-            {name: 'Fruitful Vino', value: 'drink4',image: '/fruitful_vino.png'},
-            {name: 'Pineapple Serenade', value: 'drink5',image: '/pineapple_serenade.png'},
+            {
+              name: 'Tropical Fusion', 
+              value: 'drink1',
+              image: '/tropical_fusion.png',
+              description: ' Tall, clear glass filled with a vibrant mixture of orange, yellow, and red hues, representing the tropical flavors. The drink is garnished with a slice of orange and a cherry on top. The glass is surrounded by small drops of condensation, indicating its chilled nature. The background features a sandy beach and the silhouette of a palm tree, enhancing the tropical ambiance.'
+            },
+            {
+              name: 'Tamarind Echo', 
+              value: 'drink2',
+              image: '/tamarind_echo.png',
+              description: ' There\'s a twist of lemon peel on the rim of the glass. Beside the glass, there\'s a bowl of tamarind pods, showcasing the primary ingredient. The setting is on a rustic wooden table with ambient lighting from above, casting a soft shadow beneath the glass.'
+            },
+            {
+              name: 'Guava Groove', 
+              value: 'drink3',
+              image: '/guava_groove.png',
+              description: ' The drink is garnished with a thin slice of guava and a sprig of mint. The glass sits on a white ceramic coaster, and there are a few whole guavas and cut halves around the glass, emphasizing the primary ingredient. The background is a light pastel pink, complementing the drink\'s color and giving a refreshing feel.'
+            },
+            {
+              name: 'Fruitful Vino', 
+              value: 'drink4',
+              image: '/fruitful_vino.png',
+              description: ' an elegant wine glass filled with a deep purple-red wine that captures the richness of various fruits. Floating on the surface are tiny pieces of diced fruits like apple, grape, and berry. The base of the glass rests on a dark wooden table. In the background, there\'s a bottle of wine with a label that reads \"Fruitful Vino\" and a bowl of mixed fruits that have been used in the wine.'
+            },
+            {
+              name: 'Pineapple Serenade', 
+              value: 'drink5',
+              image: '/pineapple_serenade.png',
+              description: '  The drink is bubbly, with small effervescent bubbles rising to the surface. It\'s garnished with a triangular slice of fresh pineapple on the rim and a curly straw. The glass is set on a bamboo mat, and behind it, there\'s a whole pineapple with its leafy crown and a backdrop of a serene beach sunset, creating a harmonious and tropical ambiance.'
+            },
         ],
         services: [
             {

@@ -9,33 +9,25 @@
       class="mySwiper"
     >
       <swiper-slide
-        v-for="(drink, index) in drinks"
+        v-for="drink in drinks"
       >
         <div class="slide-content flex">
             <div class="text-content flex-1">
                 <div class="text">
                     <div class="title">{{ drink.name}}</div>
                     <div class="subtitle">Subtitle</div>
-                    <div class="text">
-                        <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
-                        dictum mattis velit, sit amet faucibus felis iaculis nec. Nulla
-                        laoreet justo vitae porttitor porttitor. Suspendisse in sem justo.
-                        Integer laoreet magna nec elit suscipit, ac laoreet nibh euismod.
-                        Aliquam hendrerit lorem at elit facilisis rutrum. Ut at ullamcorper
-                        velit. Nulla ligula nisi, imperdiet ut lacinia nec, tincidunt ut
-                        libero. Aenean feugiat non eros quis feugiat.
-                        </p>
+                    <div class="p-20">
+                        <p>{{drink.description}}</p>
                     </div>
-                </div>
-                <div class="p-4">
-                    <input 
-                        type="checkbox" 
-                        :id="drink.value" 
-                        :checked="isSelected(drink)" 
-                        @input="event => updateSelectedDrinks(event, drink)"
-                        >
-                    <label :for="drink.value" class="ml-2">Yes Please! 😋</label>
+                    <div>
+                        <input 
+                            type="checkbox" 
+                            :id="drink.value" 
+                            :checked="isSelected(drink)" 
+                            @input="event => updateSelectedDrinks(event, drink)"
+                            >
+                        <label :for="drink.value" class="ml-2">Yes Please! 😋</label>
+                    </div>
                 </div>
             </div>
             <div class="image-content flex-1">
@@ -49,9 +41,6 @@
   <style scoped>
   .slide-content {
       flex-direction: row;  /* This makes the text-content and image-content sit side by side */
-  }
-  .text-content {
-      padding: 20px;  /* Optional: Adding some padding around text content */
   }
   </style>
 

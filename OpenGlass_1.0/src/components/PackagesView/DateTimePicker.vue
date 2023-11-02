@@ -1,32 +1,44 @@
 <template>
-    <div>
-      <!-- Date input -->
-      <label for="date" class="block text-sm font-medium text-gray-700">Select a date:</label>
-      <input type="date" id="date" :value="selectedDate" @change="selectDate($event)" class="mt-1 p-2 rounded-md shadow-sm">
-  
-      <!-- Time input -->
-      <label for="time" class="block text-sm font-medium text-gray-700">Select a time:</label>
-      <select id="time" :value="selectedTime" @change="selectTime($event)" class="mt-1 p-2 rounded-md shadow-sm">
-        <option value="10:00 AM">10:00 AM - 1:00 PM</option>
-        <option value="11:00 AM">2:00 PM - 4:00 PM</option>
-        <option value="12:00 PM">6:00 PM - 10:00 PM</option>
-      </select>
-    </div>
+  <div class="flex flex-col md:flex-row gap-4">
+      <!-- Date Picker -->
+      <div class="w-full md:w-1/2">
+          <label for="date" class="block text-sm font-medium text-gray-700">Select a date:</label>
+          <!-- <v-date-picker elevation="24"></v-date-picker> -->
+          <input type="date" id="date" :value="selectedDate" @change="selectDate($event)" class="mt-1 p-2 rounded-md shadow-sm w-full">
+      </div>
+
+      <!-- Time Picker -->
+      <div class="w-full md:w-1/2">
+          <label for="time" class="block text-sm font-medium text-gray-700">Select a time:</label>
+          <ul class="mt-1 p-2 rounded-md shadow-sm w-full bg-white">
+              <li v-for="(time, index) in times" :key="index" @click="selectTime(time)" :class="selectedTime === time ? 'bg-gray-200' : ''" class="p-2 cursor-pointer">
+                  {{ time }}
+              </li>
+          </ul>
+      </div>
+  </div>
 </template>
 
 <script>
 export default {
-    props: {
-      selectedDate: String,
-      selectedTime: String,
-    },
-    methods: {
+  data() {
+      return {
+          selectedDate: '',
+          selectedTime: '',
+          times: ['10:00 AM - 1:00 PM', '2:00 PM - 4:00 PM', '6:00 PM - 10:00 PM']
+      };
+  },
+  methods: {
       selectDate(event) {
-        this.$emit('update:selectedDate', event.target.value); // Emit the changed date
+          this.selectedDate = event.target.value;
+          // You can emit the selected date to the parent component if needed
+          this.$emit('update:selectedDate', this.selectedDate);
       },
-      selectTime(event) {
-        this.$emit('update:selectedTime', event.target.value); // Emit the changed time
-      },
-    },
+      selectTime(time) {
+          this.selectedTime = time;
+          // You can emit the selected time to the parent component if needed
+          this.$emit('update:selectedTime', this.selectedTime);
+      }
+  }
 };
 </script>
