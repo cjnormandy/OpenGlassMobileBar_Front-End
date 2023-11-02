@@ -406,6 +406,31 @@ module.exports = ({ app, db }) => {
       });
    });
 
+   app.put('/reactivateDrink/:drink_id', (req, res) => {
+    const drink_id = req.params.drink_id;
+    let activeQuery = 'UPDATE Drinks SET drink_status = ?';
+    const values = [];
+
+    const inactive_status = 'Active';
+    values.push(inactive_status);
+
+    activeQuery += ' WHERE drink_id = ?';
+    values.push(drink_id);
+
+    db.query(activeQuery, values, (error, results) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Error reactivaing the drink in the database.' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'Drink was not found in the menu.' });
+      }
+
+      return res.status(200).json({ message: 'Drink successfully reactivated in the database..' });
+    });
+ });
+
    //user can delete the relationships between a drink and the bases or invgredients one at a time so the alcohol item or inventory item can then be deleted on other pages of app
    app.delete('/deletedrinkrelationship/:drink_id', (req, res)=> {
     const drink_id = req.params.drink_id;
