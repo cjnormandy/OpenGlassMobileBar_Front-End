@@ -34,6 +34,12 @@ inventoryRoutes({ app, db });
 const employeesRoutes = require('./routes/Employees');
 employeesRoutes(app, db);
 
+
+const customersRoutes = require('./routes/customers');
+customersRoutes(app, db);
+
+
+
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
