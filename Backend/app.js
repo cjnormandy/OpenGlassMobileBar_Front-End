@@ -17,14 +17,11 @@ db.connect((err) => {
   if (err) {
     throw err;
   }
-  console.log('Connected to Database Successful!');
+  console.log('Connected to Database Successfully!');
 });
 
 const usersRoutes = require('./routes/users');
 usersRoutes({ app, db });
-
-const packageRoutes = require('./routes/packages');
-packageRoutes({ app, db });
 
 const menuRoutes = require('./routes/menu');
 menuRoutes({ app, db });

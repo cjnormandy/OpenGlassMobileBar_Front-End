@@ -61,6 +61,143 @@ module.exports = ({ app, db }) => {
         });
     });
 
+    app.put('/updateInventory/:inventory_id', (req, res) => {
+        const {name, type, size, price, quantity, invoiceID} = req.body;
+        const inventory_id = req.params.inventory_id;
+        let updateInventoryQuery = 'UPDATE Inventory SET ';
+        const queryParams = [];
 
+        if (name) {
+            updateInventoryQuery += 'inventory_name = ?, ';
+            queryParams.push(name);
+        }
+        if (type) {
+            updateInventoryQuery += 'inventory_type = ?, ';
+            queryParams.push(type);
+        }
+        if (size) {
+            updateInventoryQuery += 'inventory_size = ?, ';
+            queryParams.push(size);
+        }
+        if (price) {
+            updateInventoryQuery += 'inventory_price = ?, ';
+            queryParams.push(price);
+        }
+        if (quantity) {
+            updateInventoryQuery += 'inventory_quantity = ?, ';
+            queryParams.push(quantity);
+        }
 
+        
+        if (invoiceID) {
+            const selectQuery = 'SELECT * FROM Invoices WHERE invoice_id = ?';
+            db.query(selectQuery, invoiceID, (error, ivoResults) => {
+                if (error) {
+                    return res.status(500).json({ message: 'Error checking if the invoice entered exists in the database.' });
+                }
+                if (ivoResults.length === 0) {
+                    return res.status(404).json({ message: 'The invoice_id given does not exist in the database, please enter an invoice_id that exists.' });
+                }
+                if (queryParams.length === 0) {
+                    updateInventoryQuery += 'invoice_id = ?, ';
+                    queryParams.push(invoiceID);
+
+                    updateInventoryQuery = updateInventoryQuery.slice(0, -2);
+                    updateInventoryQuery += ' WHERE inventory_id = ?';
+                    queryParams.push(inventory_id);
+                }
+                else {
+                    updateInventoryQuery += 'invoice_id = ?, ';
+                    queryParams.push(invoiceID);
+                    
+                    updateInventoryQuery = updateInventoryQuery.slice(0, -2);
+                    updateInventoryQuery += ' WHERE inventory_id = ?';
+                    queryParams.push(inventory_id);
+                }
+
+                db.query(updateInventoryQuery, queryParams, (error, ivoResults1) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json({ message: 'Error updating the inventory item in the database.' });
+                    }
+                    if (ivoResults1.affectedRows === 0) {
+                        return res.status(404).json({ message: 'Inventory item not found.' });
+                    }
+                    return res.status(200).json({ message: 'Inventory item successfully updated in the database.' });
+                });
+            });
+        }
+        else {
+            if (queryParams.length === 0) {
+                return res.status(400).json({ message: 'No valid fields provided for update.' });
+            }
+
+            updateInventoryQuery = updateInventoryQuery.slice(0, -2);
+            updateInventoryQuery += ' WHERE inventory_id = ?';
+            queryParams.push(inventory_id);
+
+            db.query(updateInventoryQuery, queryParams, (error, invResults) => {
+                if (error) {
+                    console.log(error);
+                    return res.status(500).json({ message: 'Error updating the inventory item in the database.' });
+                }
+                if (invResults.affectedRows === 0) {
+                    return res.status(404).json({ message: 'Inventory item not found.' });
+                }
+                return res.status(200).json({ message: 'Inventory item successfully updated in the database.' });
+            });
+        }
+    });
+
+    app.delete('/deleteInventory/:inventory_id', (req, res) => {
+        const inventoryID = req.params.inventory_id;
+
+        const checkRelationQuery = 'SELECT * FROM Inventory_Drinks WHERE inventory_id = ?';
+        db.query(checkRelationQuery, [inventoryID], (error, relationResults) => {
+            if (error) {
+                return res.status(500).json({ message: 'Error checking inventory_drinks relationship existence' });
+            }
+            if (relationResults.length > 0) {
+                return res.status(400).json({ message: 'This inventory_item has an existing relationship with a drink in the menu, please delete all the relationships with this inventory item and try again.' });
+            }
+            else {
+                const deleteQuery = 'DELETE FROM Inventory WHERE inventory_id = ?';
+                db.query(deleteQuery, [inventoryID], (error, deleteResults) => {
+                    if (error) {
+                        return res.status(500).json({ message: 'Error deleting the inventory item.' });
+                    }
+                    if (deleteResults.affectedRows === 0) {
+                        return res.status(404).json({ message: 'Inventory item not found.' });
+                    }
+                    return res.status(200).json({ message: 'Inventory item successfully deleted in the database.' });
+                });
+            }
+        });
+    });
+
+    app.delete('/deleteInventoryRelationship/:inventory_id', (req, res) => {
+        const inventoryID = req.params.inventory_id;
+
+        const checkRelationQuery = 'SELECT * FROM Inventory_Drinks WHERE inventory_id = ?';
+        db.query(checkRelationQuery, [inventoryID], (error, relationResults) => {
+            if (error) {
+                return res.status(500).json({ message: 'Error checking inventory_drinks relationship existence' });
+            }
+            if (relationResults.length === 0) {
+                return res.status(400).json({ message: 'This inventory_item has no existing relationships with a drink in the menu.' });
+            }
+            else {
+                const deleteRelationQuery = 'DELETE FROM Inventory_Drinks WHERE inventory_id = ?';
+                db.query(deleteRelationQuery, [inventoryID], (error, deleteResults) => {
+                    if (error) {
+                        return res.status(500).json({ message: 'Error deleting the inventory item relationship.' });
+                    }
+                    if (deleteResults.affectedRows === 0) {
+                        return res.status(404).json({ message: 'Inventory item relationship not found.' });
+                    }
+                    return res.status(200).json({ message: 'Inventory item relationship successfully deleted in the database.' });
+                });
+            }
+        });
+    });
 }
