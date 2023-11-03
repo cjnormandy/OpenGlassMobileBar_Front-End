@@ -14,24 +14,24 @@
         <div class="slide-content flex">
             <div class="text-content flex-1">
                 <div class="text">
-                    <div class="title">{{ drink.name}}</div>
-                    <div class="subtitle">Subtitle</div>
+                    <div class="title">{{ drink.drink_name}}</div>
+                    <div class="subtitle">drink.drink_type</div>
                     <div class="p-20">
-                        <p>{{drink.description}}</p>
+                        <p>{{drink.drink_description}}</p>
                     </div>
                     <div>
                         <input 
                             type="checkbox" 
-                            :id="drink.value" 
+                            :id="drink.drink_id" 
                             :checked="isSelected(drink)" 
                             @input="event => updateSelectedDrinks(event, drink)"
                             >
-                        <label :for="drink.value" class="ml-2">Yes Please! 😋</label>
+                        <label :for="drink.drink_id" class="ml-2">Yes Please! 😋</label>
                     </div>
                 </div>
             </div>
             <div class="image-content flex-1">
-                <img class="object-cover w-full h-full rounded-l" :src="drink.image" alt="Service Image">
+                <img class="object-cover w-full h-full rounded-l" :src="drink.drink_image" alt="Service Image">
             </div>
         </div>
       </swiper-slide>
@@ -64,15 +64,15 @@
       },
       computed: {
         isSelected() {
-            return (drink) => this.selectedDrinks.includes(drink.value);
+            return (drink) => this.selectedDrinks.includes(drink.drink_id);
         }
       },
       methods: {
         updateSelectedDrinks(event, drink) {
           if (event.target.checked) {
-            this.$emit('addDrink', drink.value);
+            this.$emit('addDrink', drink.drink_id);
           } else {
-            this.$emit('removeDrink', drink.value);
+            this.$emit('removeDrink', drink.drink_id);
           }
         }
       },

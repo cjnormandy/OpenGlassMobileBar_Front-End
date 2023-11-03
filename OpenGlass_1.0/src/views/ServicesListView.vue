@@ -33,6 +33,8 @@
             <label class="block mt-4 text-sm font-medium text-gray-700">Select a special drink:</label>
             <!-- Drink Cards -->
             <drink-card
+              v-for="(drinks, type) in drinksByType"
+              :key="type"
               :drinks="drinks"
               :selectedDrinks="selectedDrinks"
               @addDrink="addDrink"
@@ -67,8 +69,8 @@
   </div>
 </template>
   
-  <script>
-  import { ref, onMounted } from 'vue';
+<script>
+  import { ref, onMounted, computed } from 'vue';
   import ServiceCard from '../components/PackagesView/ServiceCard.vue';
   import DrinkCard from '../components/PackagesView/DrinkCard.vue';
   import DateTimePicker from '../components/PackagesView/DateTimePicker.vue';
@@ -76,6 +78,8 @@
   
   import { Swiper, SwiperSlide, useSwiper } from 'swiper/vue';
   import 'swiper/css';
+
+  import { useDrinkStore } from '../store/drinks';
 
   export default {
     components: {
@@ -89,7 +93,20 @@
     },
     setup() {
       const swiperRef = ref(null);
-
+      const drinksDB = useDrinkStore();
+      const drinksByType = computed(() => {
+      return drinksDB.drinks.reduce((acc, drink) => {
+          const type = drink.drink_type;
+          if (!acc[type]) {
+            acc[type] = [];
+          }
+          acc[type].push(drink);
+          return acc;
+        }, {});
+      });
+      
+      console.log(drinksByType)
+      
       const onSwiper = (swiper) => {
         swiperRef.value = swiper
       };
@@ -100,10 +117,23 @@
         swiperRef.value.slideTo(index);
       };
 
+      const getAllDrinks = async () => {
+        console.log('Calling handleSubmit')
+        const success = await drinksDB.getDrinks();
+        if (success) {
+          console.log(drinksDB.drinks)
+        } else {
+          // Show an error message
+        }
+      };
+
+      onMounted(getAllDrinks)
+
       return {
         packages,
         onSwiper,
         selectPackage,
+        drinksByType
       };
     },
     data() {
