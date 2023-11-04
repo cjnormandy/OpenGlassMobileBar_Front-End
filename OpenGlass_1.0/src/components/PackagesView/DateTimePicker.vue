@@ -3,8 +3,14 @@
       <!-- Date Picker -->
       <div class="w-full md:w-1/2">
           <label for="date" class="block text-sm font-medium text-gray-700">Select a date:</label>
-          <vue-tailwind-datepicker v-model="dateValue" no-input />
-          <input type="date" id="date" :value="selectedDate" @change="selectDate($event)" class="mt-1 p-2 rounded-md shadow-sm w-full">
+            <vue-tailwind-datepicker 
+                v-model="dateValue" 
+                no-input 
+                as-single 
+                :formatter="formatter"
+                :disabled-dates="dDate"
+            />
+          <!-- <input type="date" id="date" :value="selectedDate" @change="selectDate($event)" class="mt-1 p-2 rounded-md shadow-sm w-full"> -->
       </div>
 
       <!-- Time Picker -->
@@ -22,7 +28,16 @@
 <script>
 import { ref } from 'vue'
 
-const dateValue = ref([])
+const dateValue = ref(Date)
+const formatter = ref({
+  date: 'DD MMM YYYY',
+  month: 'MMM',
+})
+function dDate(date) {
+    // const dayOfWeek = date.getDay();
+    return date < new Date() || date > new Date(2023, 11, 8)
+}
+
 export default {
   data() {
       return {
@@ -41,7 +56,7 @@ export default {
           this.selectedTime = time;
           // You can emit the selected time to the parent component if needed
           this.$emit('update:selectedTime', this.selectedTime);
-      }
+      },
   }
 };
 </script>
