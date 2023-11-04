@@ -1,3 +1,13 @@
+<script>
+import About from '../components/About.vue';
+
+export default {
+  components: {
+    About
+  },
+};
+</script>
+
 <template>
   <div class="absolute inset-x-0 top-40 z-1">
     <!-- Jumbotron -->
@@ -11,21 +21,12 @@
             </div>
         </div>
     </div>
-    <!-- Jumbotron -->
-    <div class="form p-12">
-        <!-- Start of Card -->
-        <div>
-          <form>
-            <div class="top-12">
-              <!--if you want a thin border:<div class="border-b border-gray-900/10 pb-12"> -->
-              <div class="About">
-                <h2>This is an About page</h2>
-              </div>
-            </div>
-          </form>
-        </div>
+    <!-- Content -->
+    <div>
+        <About />
     </div>
   </div>
+  
 </template>
 
 <style>
