@@ -20,6 +20,7 @@
     "swiper": "^11.0.3",
     "tw-elements": "^1.0.0",
     "vue": "^3.3.4",
+    "vue-pdf-embed": "^1.2.1",
     "vue-router": "^4.2.5",
     "vue-tailwind-datepicker": "^1.5.2"
   },
