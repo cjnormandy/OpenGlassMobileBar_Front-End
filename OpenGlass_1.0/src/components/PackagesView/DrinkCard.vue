@@ -15,7 +15,7 @@
             <div class="text-content flex-1">
                 <div class="text">
                     <div class="title">{{ drink.drink_name}}</div>
-                    <div class="subtitle">drink.drink_type</div>
+                    <div class="subtitle">{{ drink.drink_type }}</div>
                     <div class="p-20">
                         <p>{{drink.drink_description}}</p>
                     </div>
