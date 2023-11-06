@@ -1,32 +1,71 @@
 <template>
   <div class="absolute inset-x-0 top-40 z-1">
     <!-- Jumbotron -->
-    <div class="relative overflow-hidden bg-cover bg-no-repeat bg-center p-12 text-center" style="background-image: url('src/assets/calender_photo.png'); padding-bottom: 20%;"> 
-        <!-- This padding value of 56.25% gives a 16:9 aspect ratio. Adjust as needed. -->
-        <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-fixed" style="background-color: rgba(0, 0, 0, 0.6)">
-            <div class="flex h-full items-center justify-center">
-                <div class="text-white">
-                  <h2 class="mb-4 text-4xl font-semibold">Our Drink Menu</h2>
-                </div>
-            </div>
+    <div class="relative overflow-hidden bg-cover bg-no-repeat bg-center p-12 text-center" style="background-image: url('src/assets/calender_photo.png'); padding-bottom: 20%;">
+      <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-fixed" style="background-color: rgba(0, 0, 0, 0.6)">
+        <div class="flex h-full items-center justify-center">
+          <div class="text-white">
+            <h2 class="mb-4 text-4xl font-semibold">Our Drink Menu</h2>
+          </div>
         </div>
+      </div>
     </div>
-    <div class="bg-white py-24 sm:py-12">
-      <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="p-7">
-          <img decoding="async" width="1536" height="2048" alt="" data-srcset="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png 1536w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-225x300.png 225w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-768x1024.png 768w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-1152x1536.png 1152w" data-src="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png" data-sizes="(max-width: 1536px) 100vw, 1536px" class="kb-img wp-image-492 lazyloaded" src="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png" sizes="(max-width: 1536px) 100vw, 1536px" srcset="https://travelingspiritbar.com/wp-content/uploads/2019/07/2.png 1536w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-225x300.png 225w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-768x1024.png 768w, https://travelingspiritbar.com/wp-content/uploads/2019/07/2-1152x1536.png 1152w">
+    <!-- Content -->
+    <div class="p-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Loop through all drinks -->
+        <div v-for="drink in drinks" :key="drink.id" class="bg-white shadow-lg rounded-lg overflow-hidden">
+          <div class="bg-cover bg-center h-36 p-4" :style="'background-image: url(' + drink.drink_image + ');'"></div>
+          <div class="p-4">
+            <h3 class="text-xl font-semibold">{{ drink.drink_name }}</h3>
+            <p class="text-gray-600">{{ drink.drink_type }}</p>
+            <p class="text-gray-800">{{ drink.drink_description }}</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-  
-<script>
-// Initialization for ES Users
-import {
-  Ripple,
-  initTE,
-} from "tw-elements";
 
-initTE({ Ripple });
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      drinks: [], // Store the list of drinks here
+    };
+  },
+
+  methods: {
+    // Fetch drinks data from the backend
+    async fetchDrinks() {
+      const backendUrl = 'http://localhost:3000'; // Update with the correct backend URL and port
+      const apiUrl = `${backendUrl}/drinks`;
+      try {
+      const response = await axios.get(apiUrl);
+      this.drinks = response.data; // Update the drinks data property with the response
+      console.log('Response from the server:', response.data);
+      } catch (error) {
+        console.error('Error fetching drinks:', error);
+      }
+    },
+  },
+
+  created() {
+    // Call the fetchDrinks method to load drinks data when the component is created
+    this.fetchDrinks();
+  },
+};
 </script>
+
+<style scoped>
+/* Custom styles for the drink items */
+.bg-cover {
+  background-size: cover;
+}
+
+.bg-center {
+  background-position: center;
+}
+</style>

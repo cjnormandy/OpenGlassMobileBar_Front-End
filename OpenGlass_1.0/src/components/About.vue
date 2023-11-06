@@ -12,8 +12,10 @@
             <div class="w-full mt-4 md:mt-0 text-center md:text-left md:mr-12">
                 <h2 class="text-2xl font-bold mb-4">We are OpenGlass</h2>
                 <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla a odio in libero sagittis aliquam non ac odio.
-                Nulla facilisi. Donec consequat tristique eros, nec semper purus vehicula at. Vestibulum non mattis libero.
+                    Marlene and Carlos, two inspired individuals, discovered their passion for creating Latino-inspired drinks
+                    during gatherings with close friends and loved ones on special occasions. Their journey didn't start in a
+                    b        ar, but in the heartwarming moments of these gatherings. Amidst laughter and shared stories, they
+found joy in crafting drinks that celebrated their heritage and the lively Latino culture.
                 <br><br>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla a odio in libero sagittis aliquam non ac odio.
                 Nulla facilisi. Donec consequat tristique eros, nec semper purus vehicula at. Vestibulum non mattis libero.
