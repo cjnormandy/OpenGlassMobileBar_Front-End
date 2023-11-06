@@ -38,12 +38,14 @@ supplierRoutes({ app, db });
 const employeesRoutes = require('./routes/Employees');
 employeesRoutes(app, db);
 
-
 const customersRoutes = require('./routes/customers');
 customersRoutes(app, db);
 
 const feedbackRoutes = require('./routes/feedback');
 feedbackRoutes(app, db);
+
+const orderRoutes = require('./routes/orders');
+orderRoutes({ app, db });
 
 
 
