@@ -5,7 +5,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '../store/auth';
 
 const navigation = [
-  { name: 'Menu', href: '/menu' },
+  { name: 'Drink Menu', href: '/menu' },
   { name: 'Packages', href: '/packages' },
   { name: 'About Us', href: '/about'},
   { name: 'FAQ', href: '/faq' },  
@@ -32,11 +32,12 @@ const mobileMenuOpen = ref(false)
           </button>
         </div>
         <div class="hidden lg:flex lg:gap-x-12">
-          <a v-for="item in navigation" :key="item.name" :href="item.href" class="text-sm font-semibold leading-6 text-gray-900">{{ item.name }}</a>
-          <a href="/orders" v-if="isAuthenticated" class="text-sm font-semibold leading-6 text-gray-900">Orders</a>
+          <a v-for="item in navigation" :key="item.name" :href="item.href" class="text-lg font-semibold leading-6 text-gray-900">{{ item.name }}</a>
+          <a href="/orders" v-if="isAuthenticated" class="text-lg font-semibold leading-6 text-gray-900">Orders</a>
+          <a href="/inventory" v-if="isAuthenticated" class="text-lg font-semibold leading-6 text-gray-900">Inventory</a>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="/login" class="text-sm font-semibold leading-6 text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>
+          <a href="/login" class="text-me font-semibold leading-6 text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>
         </div>
       </nav>
       <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
