@@ -47,6 +47,9 @@ feedbackRoutes(app, db);
 const orderRoutes = require('./routes/orders');
 orderRoutes({ app, db });
 
+const eventRoutes = require('./routes/events');
+eventRoutes({ app, db });
+
 
 
 const port = process.env.PORT || 3000;
