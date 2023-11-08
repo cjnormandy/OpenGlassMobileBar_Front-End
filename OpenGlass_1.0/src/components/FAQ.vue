@@ -13,7 +13,7 @@
           </div>
         </div>
         <div v-if="item.open" class="mt-4">
-          <p v-html="item.answer"></p>
+          <p class="text-left" v-html="item.answer"></p>
         </div>
       </div>
     </div>

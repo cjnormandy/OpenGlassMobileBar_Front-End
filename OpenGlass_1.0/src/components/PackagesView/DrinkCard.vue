@@ -1,42 +1,24 @@
 <template>
+  <div v-for="(drinks, type) in groupedDrinks" :key="type" class="p-8">
+    <h1 class="p-3">{{ type }}</h1>
     <swiper
       :spaceBetween="30"
       :navigation="true"
-      :pagination="{
-        clickable: true,
-      }"
+      :pagination="{ clickable: true }"
       :modules="modules"
       class="mySwiper"
     >
-      <swiper-slide
-        v-for="drink in drinks"
-      >
-        <div class="slide-content flex">
-            <div class="text-content flex-1">
-                <div class="text">
-                    <div class="title">{{ drink.name}}</div>
-                    <div class="subtitle">Subtitle</div>
-                    <div class="p-20">
-                        <p>{{drink.description}}</p>
-                    </div>
-                    <div>
-                        <input 
-                            type="checkbox" 
-                            :id="drink.value" 
-                            :checked="isSelected(drink)" 
-                            @input="event => updateSelectedDrinks(event, drink)"
-                            >
-                        <label :for="drink.value" class="ml-2">Yes Please! 😋</label>
-                    </div>
-                </div>
-            </div>
-            <div class="image-content flex-1">
-                <img class="object-cover w-full h-full rounded-l" :src="drink.image" alt="Service Image">
-            </div>
-        </div>
+      <swiper-slide v-for="drink in drinks" :key="drink.drink_id">
+        <drink-slide
+          :drink="drink"
+          :selected-drinks="selectedDrinks"
+          @addDrink="handleAddDrink"
+          @removeDrink="handleRemoveDrink"
+        ></drink-slide>
       </swiper-slide>
     </swiper>
-  </template>
+  </div>
+</template>
   
   <style scoped>
   .slide-content {
@@ -45,6 +27,8 @@
   </style>
 
   <script>
+    import DrinkSlide from './DrinkSlide.vue';
+
     // Import Swiper Vue.js components
     import { Swiper, SwiperSlide } from 'swiper/vue';
   
@@ -64,21 +48,31 @@
       },
       computed: {
         isSelected() {
-            return (drink) => this.selectedDrinks.includes(drink.value);
+            return (drink) => this.selectedDrinks.includes(drink.drink_id);
+        },
+        groupedDrinks() {
+          const groups = {};
+          for (const drink of this.drinks) {
+            if (!groups[drink.drink_type]) {
+              groups[drink.drink_type] = [];
+            }
+            groups[drink.drink_type].push(drink);
+          }
+          return groups;
         }
       },
       methods: {
-        updateSelectedDrinks(event, drink) {
-          if (event.target.checked) {
-            this.$emit('addDrink', drink.value);
-          } else {
-            this.$emit('removeDrink', drink.value);
-          }
+        handleAddDrink(drinkId) {
+          this.$emit('addDrink', drinkId);
+        },
+        handleRemoveDrink(drinkId) {
+          this.$emit('removeDrink', drinkId);
         }
       },
       components: {
         Swiper,
         SwiperSlide,
+        DrinkSlide
       },
       setup() {
         return {
