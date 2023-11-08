@@ -1,6 +1,6 @@
 module.exports = ({ app, db }) => {
     app.get('/orders', (req, res) => {
-        const selectQuery = `SELECT o.order_details_id, o.order_description, o.customer_id, c.first_name, c.last_name, c.phone, c.email,
+        const selectQuery = `SELECT o.order_details_id, o.order_description, o.customer_id, c.c_first_name, c.c_last_name, c.phone, c.email,
 		o.service_id, se.service_name, d.drink_name, d.drink_type
         FROM Order_Details o
         INNER JOIN Customers c ON o.customer_id = c.customer_id
@@ -19,8 +19,8 @@ module.exports = ({ app, db }) => {
                         order_details_id: row.order_details_id,
                         order_description: row.order_description,
                         customer_id: row.customer_id,
-                        first_name: row.first_name,
-                        last_name: row.last_name,
+                        first_name: row.c_first_name,
+                        last_name: row.c_last_name,
                         phone: row.phone,
                         email: row.email,
                         service_id: row.service_id,
