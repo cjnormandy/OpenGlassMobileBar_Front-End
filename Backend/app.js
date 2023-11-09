@@ -42,6 +42,12 @@ feedbackRoutes(app, db);
 const invoiceRoutes = require('./routes/invoices');
 invoiceRoutes({ app, db });
 
+const orderRoutes = require('./routes/orders');
+orderRoutes({ app, db });
+
+const eventRoutes = require('./routes/events');
+eventRoutes({ app, db });
+
 const supplierRoutes = require('./routes/suppliers');
 supplierRoutes({ app, db });
 

@@ -16,10 +16,12 @@
     "@vue-stripe/vue-stripe": "^4.5.0",
     "axios": "^1.6.0",
     "dayjs": "^1.11.10",
+    "pdf-lib": "^1.17.1",
     "pinia": "^2.1.7",
     "swiper": "^11.0.3",
     "tw-elements": "^1.0.0",
     "vue": "^3.3.4",
+    "vue-pdf-embed": "^1.2.1",
     "vue-router": "^4.2.5",
     "vue-tailwind-datepicker": "^1.5.2"
   },
