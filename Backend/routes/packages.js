@@ -13,15 +13,43 @@ module.exports = ({ app, db }) => {
 
   // Update a service by ID
   app.put('/UpdateServices/:id', (req, res) => {
+    const { service_name, service_price, service_description_1, service_description_2, service_description_3, included_services, image, drinkLimit } = req.body;
     const id = req.params.id;
-    const updateFields = req.body;
-
     let updateQuery = 'UPDATE Services SET ';
     const values = [];
 
-    for (const key in updateFields) {
-      updateQuery += `${key}=?, `;
-      values.push(updateFields[key]);
+    if (service_name) {
+      updateQuery += 'service_name = ?, ';
+      values.push(service_name);
+    }
+    if (service_price) {
+      updateQuery += 'service_price = ?, ';
+      values.push(service_price);
+    }
+    if (service_description_1) {
+      updateQuery += 'service_description_1 = ?, ';
+      values.push(service_description_1);
+    }
+    if (service_description_2) {
+      updateQuery += 'service_description_2 = ?, ';
+      values.push(service_description_2);
+    }
+    if (service_description_3) {
+      updateQuery += 'service_description_3 = ?, ';
+      values.push(service_description_3);
+    }
+    if (included_services) {
+      updateQuery += 'included_services = ?, ';
+      const newServices = JSON.stringify(included_services);
+      values.push(newServices);
+    }
+    if (image) {
+      updateQuery += 'image = ?, ';
+      values.push(image);
+    }
+    if (drinkLimit) {
+      updateQuery += 'drinkLimit = ?, ';
+      values.push(drinkLimit);
     }
 
     updateQuery = updateQuery.slice(0, -2);
@@ -40,10 +68,10 @@ module.exports = ({ app, db }) => {
 
   // Add a new service
   app.post('/AddServices', (req, res) => {
-    const { service_name, service_price, service_description_1, service_description_2, service_description_3, included_services } = req.body;
-    const insertQuery = 'INSERT INTO Services (service_name, service_price, service_description_1, service_description_2, service_description_3, included_services) VALUES (?, ?, ?, ?, ?, ?)';
+    const { service_name, service_price, service_description_1, service_description_2, service_description_3, included_services, image, drinkLimit } = req.body;
+    const insertQuery = 'INSERT INTO Services (service_name, service_price, service_description_1, service_description_2, service_description_3, included_services, image, drinkLimit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-    db.query(insertQuery, [service_name, service_price, service_description_1, service_description_2, service_description_3, JSON.stringify(included_services)], (error, results) => {
+    db.query(insertQuery, [service_name, service_price, service_description_1, service_description_2, service_description_3, JSON.stringify(included_services), image, drinkLimit], (error, results) => {
       if (error) {
         console.log(error);
         return res.status(500).json({ message: 'Internal server error' });
@@ -66,6 +94,4 @@ module.exports = ({ app, db }) => {
     });
   });
 
-  // Import routes for FAQs
-  //servicesRoutes({ app, db });
 };
