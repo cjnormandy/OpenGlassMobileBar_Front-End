@@ -1,4 +1,4 @@
-module.exports = (app, db) => {
+module.exports = ({ app, db }) => {
     // Get all employees
     app.get('/employees', (req, res) => {
         const getQuery = 'SELECT * FROM Employees WHERE employee_status != "Inactive"';

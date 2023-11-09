@@ -1,4 +1,4 @@
-module.exports = (app, db) => {
+module.exports = ({ app, db }) => {
     // Create a new transaction
     app.post('/createtransaction', (req, res) => {
         const { customer_id, service_id, payment_type } = req.body;

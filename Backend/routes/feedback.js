@@ -1,4 +1,4 @@
-module.exports = (app, db) => {
+module.exports = ({ app, db }) => {
     // Get all feedback
     app.get('/feedback', (req, res) => {
         const getQuery = 'SELECT * FROM Feedback';

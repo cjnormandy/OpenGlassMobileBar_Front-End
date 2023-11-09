@@ -30,14 +30,16 @@ const inventoryRoutes = require('./routes/inventory');
 inventoryRoutes({ app, db });
 
 const employeesRoutes = require('./routes/Employees');
-employeesRoutes(app, db);
+employeesRoutes({ app, db });
 
+const packagesRoutes = require('./routes/packages');
+packagesRoutes({ app, db });
 
 const customersRoutes = require('./routes/customers');
-customersRoutes(app, db);
+customersRoutes({ app, db });
 
 const feedbackRoutes = require('./routes/feedback');
-feedbackRoutes(app, db);
+feedbackRoutes({ app, db });
 
 const invoiceRoutes = require('./routes/invoices');
 invoiceRoutes({ app, db });
@@ -52,10 +54,10 @@ const supplierRoutes = require('./routes/suppliers');
 supplierRoutes({ app, db });
 
 const paymentsRoutes = require('./routes/payments');
-paymentsRoutes(app, db);
+paymentsRoutes({ app, db });
 
 const transactionsRoutes = require('./routes/transactions');
-transactionsRoutes(app, db);
+transactionsRoutes({ app, db });
 
 const port = process.env.PORT || 3000;
 
