@@ -50,8 +50,7 @@
             <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.inventory_quantity }}</td>
             <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.invoice_id }}</td>
             <td class="px-6 py-4 whitespace-no-wrap">
-                
-              <!--- <button @click="editDrink(drink)">Edit</button> --->
+              <button @click="editDrink(drink)">Edit</button> -
               <button @click="deleteDrink(drink)" class="text-red-500 hover:text-red-700">Delete</button>
               </td>
             </tr>
@@ -82,17 +81,16 @@
         </table>
         </div>
         
-        <!-- Unused Edit Form -->
-        <!-- <div v-if="isEditing">
+        <div v-if="isEditing" class="mb-2">
           <input v-model="editedDrink.inventory_name" placeholder="Name">
           <input v-model="editedDrink.inventory_type" placeholder="Type">
           <input v-model="editedDrink.inventory_size" placeholder="Size">
           <input v-model="editedDrink.inventory_price" placeholder="Price">
           <input v-model="editedDrink.inventory_quantity" placeholder="Quantity">
           <input v-model="editedDrink.invoice_id" placeholder="Pre-existing Invoice ID">
-          <button @click="updateInventoryItem">Update Drink</button>
+          <button @click="updateInventoryItem" class="text-green-400 hover:text-green-700">Update Drink</button> -
           <button @click="cancelEdit">Cancel</button>
-        </div> -->
+        </div>
       </div>
   </div>
 </template>
@@ -174,11 +172,25 @@ export default {
     },
 
     async updateInventoryItem() {
+      if (!this.editedDrink) {
+        console.error('No edited drink to update.');
+        return;
+      }
+
       const backendUrl = 'http://localhost:3000'; // Updated with the correct backend URL and port
       const apiUrl = `${backendUrl}/updateInventory/${this.editedDrink.inventory_id}`;
 
+      const requestData = {
+        name: this.editedDrink.inventory_name,
+        type: this.editedDrink.inventory_type,
+        size: this.editedDrink.inventory_size,
+        price: this.editedDrink.inventory_price,
+        quantity: this.editedDrink.inventory_quantity,
+        invoiceID: this.editedDrink.invoice_id,
+      };
+
       try {
-        const response = await axios.put(apiUrl, this.editedDrink, {
+        const response = await axios.put(apiUrl, requestData, {
           headers: { 'Content-Type': 'application/json' },
         });
 
@@ -186,6 +198,8 @@ export default {
           this.fetchInventory(); // Refresh the inventory data
           this.isEditing = false; // Hide the edit form
           this.editedDrink = null; // Clear the editedDrink
+        } else {
+          console.error('Error updating inventory item. Response:', response.data);
         }
       } catch (error) {
         console.error('Error updating inventory item:', error);
