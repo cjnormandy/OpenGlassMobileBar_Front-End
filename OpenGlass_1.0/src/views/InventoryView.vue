@@ -1,8 +1,7 @@
 <template>
   <div class="absolute inset-x-0 top-40 z-1">
-    <!-- Jumbotron -->
-    <div class="relative overflow-hidden bg-cover bg-no-repeat bg-center p-12 text-center" style="background-image: url('/inventorybanner.jpg'); padding-bottom: 20%;"> 
-        <!-- This padding value of 56.25% gives a 16:9 aspect ratio. Adjust as needed. -->
+    <!-- Banner -->
+    <div class="relative overflow-hidden bg-cover bg-no-repeat bg-center p-12 text-center" style="background-image: url('/inventorybanner.jpg'); padding-bottom: 20%;">
         <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-fixed" style="background-color: rgba(0, 0, 0, 0.6)">
             <div class="flex h-full items-center justify-center">
                 <div class="text-white">
@@ -11,7 +10,7 @@
             </div>
         </div>
     </div>
-    <!--Content-->
+    <!--Inventory Content-->
       <div class="w-full">
         <h1></h1><!--No Table Title-->
         <div class="border border-gray-200 p-2">
@@ -43,16 +42,51 @@
           </thead>
           <tbody>
             <tr v-for="drink in inventoryItems" :key="drink.inventory_id">
-            <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.inventory_name }}</td>
-            <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.inventory_type }}</td>
-            <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.inventory_size }}</td>
-            <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.inventory_price }}</td>
-            <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.inventory_quantity }}</td>
-            <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">{{ drink.invoice_id }}</td>
-            <td class="px-6 py-4 whitespace-no-wrap">
-                
-              <!--- <button @click="editDrink(drink)">Edit</button> --->
-              <button @click="deleteDrink(drink)" class="text-red-500 hover:text-red-700">Delete</button>
+              <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
+                <template v-if="editingItemId !== drink.inventory_id">
+                  {{ drink.inventory_name }}
+                </template>
+                <input v-else v-model="editedDrink.inventory_name" placeholder="Name">
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
+                <template v-if="editingItemId !== drink.inventory_id">
+                  {{ drink.inventory_type }}
+                </template>
+                <input v-else v-model="editedDrink.inventory_type" placeholder="Type">
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
+                <template v-if="editingItemId !== drink.inventory_id">
+                  {{ drink.inventory_size }}
+                </template>
+                <input v-else v-model="editedDrink.inventory_size" placeholder="Size">
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
+                <template v-if="editingItemId !== drink.inventory_id">
+                  {{ drink.inventory_price }}
+                </template>
+                <input v-else v-model="editedDrink.inventory_price" placeholder="Price">
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
+                <template v-if="editingItemId !== drink.inventory_id">
+                  {{ drink.inventory_quantity }}
+                </template>
+                <input v-else v-model="editedDrink.inventory_quantity" placeholder="Quantity">
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
+                <template v-if="editingItemId !== drink.inventory_id">
+                  {{ drink.invoice_id }}
+                </template>
+                <input v-else v-model="editedDrink.invoice_id" placeholder="ID">
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
+                <template v-if="editingItemId !== drink.inventory_id">
+                  <button @click="editDrink(drink)" class="text-green-500 hover:text-green-700">Edit</button> -
+                  <button @click="deleteDrink(drink)" class="text-red-500 hover:text-red-700">Delete</button>
+                </template>
+                <template v-else>
+                  <button @click="updateInventoryItem(drink)" class="text-indigo-500 hover:text-indigo-700">Save</button> -
+                  <button @click="cancelEdit">Cancel</button>
+                </template>
               </td>
             </tr>
             <tr>
@@ -81,18 +115,6 @@
           </tbody>
         </table>
         </div>
-        
-        <!-- Unused Edit Form -->
-        <!-- <div v-if="isEditing">
-          <input v-model="editedDrink.inventory_name" placeholder="Name">
-          <input v-model="editedDrink.inventory_type" placeholder="Type">
-          <input v-model="editedDrink.inventory_size" placeholder="Size">
-          <input v-model="editedDrink.inventory_price" placeholder="Price">
-          <input v-model="editedDrink.inventory_quantity" placeholder="Quantity">
-          <input v-model="editedDrink.invoice_id" placeholder="Pre-existing Invoice ID">
-          <button @click="updateInventoryItem">Update Drink</button>
-          <button @click="cancelEdit">Cancel</button>
-        </div> -->
       </div>
   </div>
 </template>
@@ -103,7 +125,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      isEditing: false,
+      editingItemId: null,
       editedDrink: null,
       inventoryItems: [],
       newInventoryItem: {
@@ -117,9 +139,10 @@ export default {
     };
   },
 
+  //GET METHOD
   methods: {
     async fetchInventory() {
-      const backendUrl = 'http://localhost:3000'; // Updated with the correct backend URL and port
+      const backendUrl = 'http://localhost:3000';
       const apiUrl = `${backendUrl}/inventory`;
       try {
       const response = await axios.get(apiUrl);
@@ -129,8 +152,9 @@ export default {
     }
     },
 
+    //POST METHOD
     async addInventoryItem() {
-      const backendUrl = 'http://localhost:3000'; // Updated with the correct backend URL and port
+      const backendUrl = 'http://localhost:3000';
       const apiUrl = `${backendUrl}/addInvItem`;
       
       const requestData = {
@@ -162,36 +186,55 @@ export default {
       }
     },
 
-    async editDrink(drink) {
+    //PUT METHOD HELPER 1
+    editDrink(drink) {
       console.log('Edit button clicked for drink:', drink);
+      this.editingItemId = drink.inventory_id;
       this.editedDrink = { ...drink };
-      this.isEditing = true;
     },
-
-    async cancelEdit() {
-      this.isEditing = false;
+    //PUT METHOD HELPER 2
+    cancelEdit() {
+      this.editingItemId = null;
       this.editedDrink = null;
     },
 
-    async updateInventoryItem() {
+    //PUT METHOD
+    async updateInventoryItem(drink) {
+      if (!this.editedDrink) {
+        console.error('No edited drink to update.');
+        return;
+      }
+
       const backendUrl = 'http://localhost:3000'; // Updated with the correct backend URL and port
       const apiUrl = `${backendUrl}/updateInventory/${this.editedDrink.inventory_id}`;
 
+      const requestData = {
+        name: this.editedDrink.inventory_name,
+        type: this.editedDrink.inventory_type,
+        size: this.editedDrink.inventory_size,
+        price: this.editedDrink.inventory_price,
+        quantity: this.editedDrink.inventory_quantity,
+        invoiceID: this.editedDrink.invoice_id,
+      };
+
       try {
-        const response = await axios.put(apiUrl, this.editedDrink, {
+        const response = await axios.put(apiUrl, requestData, {
           headers: { 'Content-Type': 'application/json' },
         });
 
         if (response.status === 200) {
           this.fetchInventory(); // Refresh the inventory data
-          this.isEditing = false; // Hide the edit form
+          this.editingItemId = null; // Exit editing mode
           this.editedDrink = null; // Clear the editedDrink
+        } else {
+          console.error('Error updating inventory item. Response:', response.data);
         }
       } catch (error) {
         console.error('Error updating inventory item:', error);
       }
     },
 
+    //DELETE METHOD
     async deleteDrink(drink) {
       const backendUrl = 'http://localhost:3000';
       const apiUrl = `${backendUrl}/deleteInventory/${drink.inventory_id}`;
@@ -218,7 +261,6 @@ export default {
 </script>
   
 <style scoped>
-
 table {
   width: 100%;
   border-collapse: collapse;
