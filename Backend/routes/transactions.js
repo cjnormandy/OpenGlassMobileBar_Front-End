@@ -192,14 +192,26 @@ module.exports = ({ app, db }) => {
     app.delete('/deletetransaction/:id', (req, res) => {
         const id = req.params.id;
 
-        const deleteQuery = 'DELETE FROM Transactions WHERE transaction_id=?';
-
-        db.query(deleteQuery, [id], (error, results) => {
+        const selectQuery = 'SELECT * FROM Payments WHERE transaction_id = ?';
+        db.query(selectQuery, [id], (error, payResults) => {
             if (error) {
                 console.log(error);
                 return res.status(500).json({ message: 'Internal server error' });
             }
-            return res.status(200).json({ message: 'Transaction deleted successfully' });
+            if (payResults.length > 0) {
+                return res.status(400).json({ message: 'This transaction has an existing relationship with a payment. First delete that payment or change the transaction_id of that payment and try again ' });
+            }
+            else {
+                const deleteQuery = 'DELETE FROM Transactions WHERE transaction_id=?';
+
+                db.query(deleteQuery, [id], (error, results) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json({ message: 'Internal server error' });
+                    }
+                    return res.status(200).json({ message: 'Transaction deleted successfully' });
+                });
+            }
         });
     });
 };

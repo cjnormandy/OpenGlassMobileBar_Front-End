@@ -175,14 +175,26 @@ module.exports = ({ app, db }) => {
     app.delete('/Deletepayment/:id', (req, res) => {
         const id = req.params.id;
 
-        const deleteQuery = 'DELETE FROM Payments WHERE payment_id=?';
-
-        db.query(deleteQuery, [id], (error, results) => {
+        const selectQuery = 'SELECT * FROM Customer_Events WHERE payment_id = ?';
+        db.query(selectQuery, [id], (error, eventResults) => {
             if (error) {
                 console.log(error);
                 return res.status(500).json({ message: 'Internal server error' });
             }
-            return res.status(200).json({ message: 'Payment deleted successfully' });
+            if (eventResults.length > 0) {
+                return res.status(400).json({ message: 'This payment has an existing relationship with an event. First delete that event or change the payment_id of that event and try again ' });
+            }
+            else {
+                const deleteQuery = 'DELETE FROM Payments WHERE payment_id=?';
+
+                db.query(deleteQuery, [id], (error, results) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json({ message: 'Internal server error' });
+                    }
+                    return res.status(200).json({ message: 'Payment deleted successfully' });
+                });
+            }
         });
     });
 };
