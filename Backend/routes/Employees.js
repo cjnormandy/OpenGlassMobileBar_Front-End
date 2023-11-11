@@ -1,4 +1,4 @@
-module.exports = (app, db) => {
+module.exports = ({ app, db }) => {
     // Get all employees
     app.get('/employees', (req, res) => {
         const getQuery = 'SELECT * FROM Employees WHERE employee_status != "Inactive"';
@@ -14,7 +14,7 @@ module.exports = (app, db) => {
     // Create a new employee
     app.post('/Addemployees', (req, res) => {
         const { first_name, last_name, phone, email, employee_role } = req.body;
-        const insertQuery = 'INSERT INTO Employees (first_name, last_name, phone, email, employee_role, employee_status) VALUES (?, ?, ?, ?, ?, ?)';
+        const insertQuery = 'INSERT INTO Employees (e_first_name, e_last_name, phone, email, employee_role, employee_status) VALUES (?, ?, ?, ?, ?, ?)';
 
         db.query(insertQuery, [first_name, last_name, phone, email, employee_role, 'Active'], (error, results) => {
             if (error) {

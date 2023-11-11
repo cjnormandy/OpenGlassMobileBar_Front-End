@@ -1,4 +1,4 @@
-module.exports = (app, db) => {
+module.exports = ({ app, db }) => {
     // Get all customers
     app.get('/customers', (req, res) => {
         const getQuery = 'SELECT * FROM Customers';
@@ -14,7 +14,7 @@ module.exports = (app, db) => {
     // Create a new customer
     app.post('/Addcustomers', (req, res) => {
         const { first_name, last_name, birthday, phone, email } = req.body;
-        const insertQuery = 'INSERT INTO Customers (first_name, last_name, birthday, phone, email) VALUES (?, ?, ?, ?, ?)';
+        const insertQuery = 'INSERT INTO Customers (c_first_name, c_last_name, birthday, phone, email) VALUES (?, ?, ?, ?, ?)';
 
         db.query(insertQuery, [first_name, last_name, birthday, phone, email], (error, results) => {
             if (error) {
