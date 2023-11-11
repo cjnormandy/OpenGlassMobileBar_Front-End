@@ -2,10 +2,10 @@
     <div class="slide-content flex">
         <div class="text-content flex-1">
             <div class="text">
-                <div class="title">{{ drink.drink_name }}</div>
+                <div class="title font-bold">{{ drink.drink_name }}</div>
                 <div class="subtitle">{{ drink.drink_type }}</div>
                 <div class="p-20">
-                    <p>{{ drink.drink_description }}</p>
+                    <p class="font-semibold">{{ drink.drink_description }}</p>
                 </div>
                 <div>
                     <input 
@@ -18,8 +18,8 @@
                 </div>
             </div>
         </div>
-        <div class="image-content flex-1">
-            <img class="object-cover w-full h-full rounded-l" :src="drink.drink_image" alt="Drink Image">
+        <div class="image-content flex-1 flex justify-center items-center"> <!-- Flex container with centering -->
+            <img class="object-cover w-3/4 h-3/4 rounded" :src="drink.drink_image" alt="Drink Image">
         </div>
     </div>
 </template>

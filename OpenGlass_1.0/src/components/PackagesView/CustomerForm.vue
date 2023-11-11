@@ -15,9 +15,21 @@
                 </div>
             </div>
             <div>
-                <label for="address" >Address:</label>
+                <label for="email" >Email:</label>
+                <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                    <input id="email" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" v-model="formData.email" required />
+                </div>
+            </div>
+            <div>
+                <label for="address" >Event Address:</label>
                 <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                     <input id="address" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" v-model="formData.address" required />
+                </div>
+            </div>
+            <div>
+                <label for="phone" >Phone Number:</label>
+                <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                    <input id="phone" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" v-model="formData.phone" required />
                 </div>
             </div>
             <div>
@@ -27,9 +39,15 @@
                 </div>
             </div>
             <div>
+                <label for="date" >Date of Birth:</label>
+                <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                    <input id="date" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" type="date" v-model="formData.dob" required />
+                </div>
+            </div>
+            <div>
                 <label for="signature" >Signature:</label>
                 <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                    <input id="signature" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" type="file" @change="onSignatureChange" required />
+                    <input id="signature" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" type="text" @change="onSignatureChange" required />
                 </div>
             </div>
             <div class="pt-2">
@@ -46,7 +64,9 @@
     
   <script>
   import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+  import fontkit from '@pdf-lib/fontkit';
   export default {
+    props: {selectedDate: null, amt: null},
     data() {
       return {
         formData: {
@@ -54,38 +74,30 @@
           lastName: '',
           date: '',
           address: '',
+          dob: '',
+          phone: '',
+          email: '',
           signature: null
         }
       };
     },
     methods: {
       submitForm() {
-        // Here you would call a method to handle the PDF manipulation
-        // This method would take `this.formData` as input and modify the PDF
         this.modifyPDF();
       },
       onSignatureChange(e) {
-        const file = e.target.files[0];
-        if (file) {
-          // Convert the image to a format that can be embedded in the PDF
-          // For example, a base64 string
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            this.formData.signature = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        }
+        const signatureText = e.target.value;
+        this.formData.signature = signatureText;
       },
       async modifyPDF() {
         const pdfDoc = await PDFDocument.create()
+        pdfDoc.registerFontkit(fontkit);
         const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman)
   
         const page = pdfDoc.addPage()
         const { width, height } = page.getSize()
         const fontSize = 30
-        // Measure the width of the text at the specified font and size
         const textWidth = timesRomanFont.widthOfTextAtSize('Client Service Agreement', fontSize);
-        // Calculate the x coordinate to center the text
         const textX = (width - textWidth) / 2;
         page.drawText('Client Service Agreement', {
           x: textX,
@@ -110,38 +122,28 @@
             });
             yOffset -= lineSpacing;
           });
-          return yOffset; // Return the last Y position for further content
+          return yOffset;
         }
   
         function addHeader(page, headerText, xOffset, yOffset) {
-          const textWidth = timesRomanFont.widthOfTextAtSize(headerText, headerFontSize);
-          const textX = 50; // Center the header
+          const textX = 50;
   
           page.drawText(headerText, {
             x: textX,
             y: yOffset,
             size: headerFontSize,
             font: timesRomanFont,
-            color: rgb(0.1, 0.1, 0.1), // A slightly off-black color
+            color: rgb(0.1, 0.1, 0.1),
           });
   
-          return yOffset - (headerFontSize + 10); // Added extra space after the header
-        }
-  
-        // Function to check if we need a new page
-        function checkNewPage(yOffset, margin) {
-          if (yOffset < margin) {
-            page.addPage();
-            return height - margin; // Reset yOffset for the new page
-          }
-          return yOffset;
+          return yOffset - (headerFontSize + 10);
         }
   
         // This section should replace the incorrect page.setText
         const introTxtLines = [
           `This bartending mobile services contract is between Open Glass Mobile Bar, LLC and`,
           `${this.formData.firstName} ${this.formData.lastName}. Both parties are in agreement to the following for the`,
-          `event taking place on [Service.Date].`
+          `event taking place on ${this.selectedDate}.`
         ];
         
         addMultilineText(page, introTxtLines, 50, yOffset - 30, 18);
@@ -151,7 +153,7 @@
         addHeader(page, "Description of Services", 50, yOffset);
   
         const descripTxtLines = [
-          `On ${this.formData.date} at [Location], ${this.formData.firstName} will provide to ${this.formData.lastName} the following`,
+          `On ${this.formData.date} at ${this.formData.address}, ${this.formData.firstName} will provide to ${this.formData.lastName} the following`,
           `bartending services:`
         ];
         
@@ -162,7 +164,7 @@
         addHeader(page, "-----------", 50, yOffset);
   
         const descripTxtLines2 = [
-          `Open Glass Mobile Bar, LLC bartenders will work a total of 3 hours on [date of service].`
+          `Open Glass Mobile Bar, LLC bartenders will work a total of 3 hours on ${this.selectedDate}.`
         ];
   
         addMultilineText(page, descripTxtLines2, 50, yOffset - 30, 18);
@@ -172,7 +174,7 @@
         addHeader(page, "Payment", 50, yOffset)
   
         const paymentTxtLines = [
-          `Open Glass Mobile Bar, LLC will receive a 30% deposit of the full amount of $[Amount] to`,
+          `Open Glass Mobile Bar, LLC will receive a 30% deposit of the full amount of \$${this.amt} to`,
           `secure services for this event, due upon signature of this agreement. It may not be possible to`,
           `provide additional service time, request for extended service time may be accommodated only if`,
           `feasible and at discretion of the bartender. The remaining payment balance will be automatically`,
@@ -199,8 +201,8 @@
           `Full payment is required 14 days before the event. Once the full payment is submitted, it is non-`,
           `refundable. Should the Client choose to cancel the event before the`,
           `services, ${this.formData.firstName} ${this.formData.lastName} will provide Open Glass Mobile Bar, LLC with`,
-          `notice no later than 14 days before [Service.Date]. Cancellation past this date will result in not`,
-          `receiving the full amount of $[Amount] paid to secure the service of the event.`,
+          `notice no later than 14 days before ${this.selectedDate}. Cancellation past this date will result in not`,
+          `receiving the full amount of \$${this.amt} paid to secure the service of the event.`,
           `remaining balance will be due as shown in the table below.`
         ]
         addMultilineText(page, cancelTxtLines, 50, yOffset - 30, 18)
@@ -220,37 +222,36 @@
         const page2 = pdfDoc.addPage()
         const { width: width2, height: height2 } = page2.getSize()
   
-        let yOffset2 = height2 - 1 * fontSize; // Adjust as needed
+        let yOffset2 = height2 - 1 * fontSize;
   
         
   
-        yOffset2 -= (1 * fontSize) + 20; // Adjust space after the title
+        yOffset2 -= (1 * fontSize) + 20;
   
-        // Additional Terms Header
+
         const additionalTermsHeader = 'Additional Terms';
-        const additionalTermsHeaderWidth = timesRomanFont.widthOfTextAtSize(additionalTermsHeader, fontSize);
   
         page2.drawText(additionalTermsHeader, {
-          x: 50, // Since this header is not centered, we're using a fixed x-offset
+          x: 50,
           y: yOffset2,
           size: 20,
           font: timesRomanFont,
           color: rgb(0, 0, 0),
         });
   
-        yOffset2 -= 20; // Adjust space after the header
+        yOffset2 -= 20;
   
         // Now let's add the additional terms text
         const additionalTermsLines = [
           `• Open Glass Mobile Bar, LLC will be solely responsible for the acquisition of all licenses and`,
-          `    permits required to provide bartending services for [event date].`,
+          `    permits required to provide bartending services for ${this.selectedDate}.`,
           `• Open Glass Mobile Bar, LLC will be solely responsible for the acquisition any and all licenses`,
           `    and permits needed and will be responsible for providing all drinks offered in this bartender contract.`,
           `• Open Glass Mobile Bar, LLC bartender will be permitted to display a tip jar'/container.`,
           `• Open Glass Mobile Bar, LLC will be responsible for all set up and take down of the service area.`,
           `• Open Glass Mobile Bar, LLC will be responsible for ensuring that no underage patrons`,
           `    purchase or consume alcohol from the bar. Guests that are asked to present an ID and cannot,`,
-          `    will not be served. The bartender will only sell/serve to those legally permitted to drink in [Venue.State].`,
+          `    will not be served. The bartender will only sell/serve to those legally permitted to drink in Texas.`,
           `• The bartender will also use his'/her discretion to cease serving patrons who are visibly intoxicated,`,
           `    behaving inappropriately, or who may pose a risk to themselves or others.`,
           `    Open Glass Mobile Bar, LLC is not responsible for any individual who may`,
@@ -283,7 +284,7 @@
         ];
   
         additionalTermsLines.forEach(line => {
-          page2.drawText(line.trim(), { // Trim each line to remove leading/trailing whitespace
+          page2.drawText(line.trim(), {
             x: 50,
             y: yOffset2,
             size: 12,
@@ -291,38 +292,28 @@
             color: rgb(0, 0, 0),
           });
   
-          yOffset2 -= 18; // Adjust line spacing as needed
+          yOffset2 -= 18;
         });
   
-        // Check if the signature data is available and then embed it into the PDF
         if (this.formData.signature) {
-          // Remove the Data URL prefix (i.e., "data:image/png;base64,") to get the raw base64 data
-          const signatureBase64 = this.formData.signature.split(',')[1];
-          // Convert the base64 data to a Uint8Array
-          const signatureBytes = Uint8Array.from(atob(signatureBase64), c => c.charCodeAt(0));
+          const fontBytes = await fetch('/CedarvilleCursive-Regular.ttf').then(res => res.arrayBuffer());
+          const cursiveFont = await pdfDoc.embedFont(fontBytes);
   
-          // Embed the signature image into the PDF
-          const signatureImage = await pdfDoc.embedPng(signatureBytes);
-  
-          // Define the signature's dimensions and position on the second page
-          const signatureWidth = 130;
-          const signatureHeight = 60;
           const signatureX = 50;
           const signatureY = 5;
-  
-          // Add the signature image to the second page (page2)
-          page2.drawImage(signatureImage, {
+          const fontSize = 24;
+
+
+          page2.drawText(this.formData.signature, {
             x: signatureX,
             y: signatureY,
-            width: signatureWidth,
-            height: signatureHeight
+            font: cursiveFont,
+            size: fontSize
           });
         }
-  
-        // Serialize the PDFDocument to bytes (a Uint8Array)
+
         const pdfBytes = await pdfDoc.save();
   
-        // Trigger the download of the PDF
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);

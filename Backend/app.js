@@ -32,6 +32,8 @@ inventoryRoutes({ app, db });
 const employeesRoutes = require('./routes/Employees');
 employeesRoutes(app, db);
 
+const packagesRoutes = require('./routes/packages');
+packagesRoutes({ app, db })
 
 const customersRoutes = require('./routes/customers');
 customersRoutes(app, db);

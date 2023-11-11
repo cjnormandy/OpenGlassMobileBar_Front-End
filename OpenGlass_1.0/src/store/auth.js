@@ -7,6 +7,15 @@ export const useAuthStore = defineStore({
     user: null,
     token: null,
   }),
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: 'auth',
+        storage: localStorage,
+      },
+    ],
+  },
   getters: {
     isAuthenticated() {
         console.log('CJ this is user from getter ', !!this.user)
@@ -17,18 +26,17 @@ export const useAuthStore = defineStore({
     async login(email, password) {
         try {
             const response = await axios.post('http://localhost:3000/users/login', {
-                username: email,  // Assuming the backend expects a field named 'username'
+                username: email,
                 password: password,
             });
             
-            // Assuming a successful login will return a token in the response body
-            this.user = { email };  // Update the user state
-            this.token = response.data.token;  // Update the token state
+            this.user = { email };
+            this.token = response.data.token;
 
-            return true;  // Login successful
+            return true;
         } catch (error) {
             console.error('Login failed:', error.response ? error.response.data : error.message);
-            return false;  // Login failed
+            return false;
         }
     },
   },

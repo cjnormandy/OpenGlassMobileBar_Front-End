@@ -174,7 +174,7 @@ export default {
     },
 
     async updateInventoryItem() {
-      const backendUrl = 'http://localhost:3000'; // Updated with the correct backend URL and port
+      const backendUrl = 'http://localhost:3000';
       const apiUrl = `${backendUrl}/updateInventory/${this.editedDrink.inventory_id}`;
 
       try {
@@ -183,9 +183,9 @@ export default {
         });
 
         if (response.status === 200) {
-          this.fetchInventory(); // Refresh the inventory data
-          this.isEditing = false; // Hide the edit form
-          this.editedDrink = null; // Clear the editedDrink
+          this.fetchInventory();
+          this.isEditing = false;
+          this.editedDrink = null;
         }
       } catch (error) {
         console.error('Error updating inventory item:', error);
@@ -200,7 +200,6 @@ export default {
       const response = await axios.delete(apiUrl);
 
       if (response.status === 200) {
-        // Item deleted successfully, update the inventory list
         this.fetchInventory();
       }
     } catch (error) {
@@ -225,7 +224,7 @@ table {
 }
 
 th, td {
-  border: 1px solid #ccc; /* Add a thin border to table cells */
+  border: 1px solid #ccc;
   padding: 5px;
   text-align: left;
 }

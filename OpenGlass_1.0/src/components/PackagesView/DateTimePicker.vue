@@ -28,14 +28,14 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import VueTailwindDatepicker from 'vue-tailwind-datepicker'; // Ensure to import this component if it's from an external library
+import { ref, watch, computed } from 'vue'
+import VueTailwindDatepicker from 'vue-tailwind-datepicker';
 
 export default {
   components: {
     VueTailwindDatepicker
   },
-  setup() {
+  setup(props, { emit }) {
     const dateValue = ref([]);
     const formatter = ref({
       date: 'DD MMM YYYY',
@@ -44,8 +44,8 @@ export default {
 
     const disabledDates = computed(() => {
       let dates = [];
-      let currentDate = new Date();  // start date
-      const endDate = new Date(2023, 11, 8);  // end date
+      let currentDate = new Date();
+      const endDate = new Date(2023, 11, 8);
       
       while (currentDate <= endDate) {
         const dayOfWeek = currentDate.getDay();
@@ -62,6 +62,12 @@ export default {
         const dayOfWeek = date.getDay();
         return dayOfWeek === 1 || dayOfWeek === 2 || dayOfWeek === 3;
     }
+
+    watch(dateValue, (newDate) => {
+      if (newDate) {
+        emit('update:selectedDate', newDate);
+      }
+    });
 
     return {
       dateValue,

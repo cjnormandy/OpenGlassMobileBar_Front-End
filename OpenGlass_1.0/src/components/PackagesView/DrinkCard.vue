@@ -1,6 +1,6 @@
 <template>
   <div v-for="(drinks, type) in groupedDrinks" :key="type" class="p-8">
-    <h1 class="p-3">{{ type }}</h1>
+    <h1 class="p-3 text-xl font-bold">{{ type }}</h1>
     <swiper
       :spaceBetween="30"
       :navigation="true"
@@ -22,7 +22,7 @@
   
   <style scoped>
   .slide-content {
-      flex-direction: row;  /* This makes the text-content and image-content sit side by side */
+      flex-direction: row;
   }
   </style>
 
@@ -43,7 +43,7 @@
   
     export default {
       props: {
-        drinks: Array,  // changed from Object to Array
+        drinks: Array,
         selectedDrinks: Array,
       },
       computed: {

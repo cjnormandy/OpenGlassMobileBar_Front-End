@@ -51,8 +51,8 @@
                     
                     <!-- Editing Mode -->
                     <input v-if="isEditing" type="text" v-model="signatureName" @blur="isEditing = false" class="mt-1 p-2 rounded-md shadow-sm bg-white" placeholder="Type your name here" ref="signatureInput" />
-                    <div>
-                      <button @click="pay">pay</button>
+                    <div v-if="!isEditing">
+                      <button class="bg-gradient-to-r from-yellow-500 to-orange-500" @click="pay">pay</button>
                     </div>
                 </div>
             </div>

@@ -19,14 +19,11 @@
     </div>
     <div class="py-2">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="">
-          <swiper @swiper="onSwiper" :options="swiperOptions" ref="mySwiper" v-if="!selectedService" class="carousel-card">
-            <swiper-slide v-for="service in services" :key="service.title">
+        <div class="p-3">
+          <div v-if="!selectedService" class=" p-2 flex flex-wrap -mx-2">
+            <div v-for="service in services" :key="service.title" class="px-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
               <service-card :service="service" @selectService="selectService"></service-card>
-            </swiper-slide>
-          </swiper>
-          <div v-if="!selectedService" class="button-container flex justify-between p-2">
-            <button v-for="pkg in packages" :key="pkg" @click="selectPackage(pkg)" class="btn">{{ pkg }}</button>
+            </div>
           </div>
           <div>{{ selectedDrink }}</div>
           <div v-if="selectedService && selectedDrinks.length < selectedService.drinkLimit" class="mt-6">
@@ -47,20 +44,15 @@
             <date-time-picker
               :selectedDate="selectedDate"
               :selectedTime="selectedTime"
-              @update:selectedDate="selectedDate = $event"
+              @update:selectedDate="handleDateChange"
               @update:selectedTime="selectedTime = $event"
             ></date-time-picker>
           </div>
           <div v-if="selectedTime" class="mt-6">
-            <!-- PDF View Button -->
-            <!-- <button @click="viewPDF" class="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              View PDF
-            </button> -->
-            <label class="block text-sm font-medium text-gray-700">Please enter your information:</label>
-            <!-- Signature Input -->
-            <signature-input :signatureName="signatureName"></signature-input>
+            <label class="block text-base font-semibold text-gray-700">Please enter your information:</label>
+            <signature-input :signatureName="signatureName" :selectedDate="selectedDate" :service-amt="selectedService.price"></signature-input>
             <div>
-              <button @click="pay">Pay</button>
+              <button class="bg-gradient-to-r from-yellow-500 to-orange-500 w-full sm:w-32 py-2" @click="pay">Pay</button>
             </div>
           </div>
         </div>
@@ -76,9 +68,10 @@
   import DateTimePicker from '../components/PackagesView/DateTimePicker.vue';
   import SignatureInput from '../components/PackagesView/SignatureInput.vue';
   
-  import { Swiper, SwiperSlide, useSwiper } from 'swiper/vue';
+  import { Swiper, SwiperSlide} from 'swiper/vue';
   import 'swiper/css';
 
+  import { useServiceStore } from '../store/services';
   import { useDrinkStore } from '../store/drinks';
 
   export default {
@@ -94,6 +87,7 @@
     setup() {
       const swiperRef = ref(null);
       const drinksDB = useDrinkStore();
+      const servicesDB = useServiceStore();
       const drinksByType = computed(() => {
       return drinksDB.drinks.reduce((acc, drink) => {
           const type = drink.drink_type;
@@ -104,8 +98,27 @@
           return acc;
         }, {});
       });
-      
-      console.log(drinksByType)
+      const services = computed(() => {
+        return servicesDB.services.map(service => ({
+              // Map the service properties to the format expected by your UI
+              title: service.service_name.toUpperCase(),
+              description: [
+                `Description: ${service.service_description_1}`,
+                service.service_description_2,
+                service.service_description_3,
+              ],
+              included_services: service.included_services,
+              // You might need to define how to get the image and drinkLimit from your service object
+              image: `/${service.service_name.toLowerCase().replace(' ', '_')}.png`,
+              price: service.service_price,
+              drinkLimit: service.drinkLimit
+
+            }));
+      })
+
+      const serviceCosts = computed(() => {
+        return servicesDB.services.map(service => parseFloat(service.service_price));
+      });
       
       const onSwiper = (swiper) => {
         swiperRef.value = swiper
@@ -115,6 +128,15 @@
       const selectPackage = (pkg) => {
         const index = packages.value.indexOf(pkg);
         swiperRef.value.slideTo(index);
+      };
+
+      const getAllServicesDB = async () => {
+        const success = await servicesDB.getServices();
+        if (success) {
+          console.log(servicesDB.services)
+        } else {
+          // Show an error message
+        }
       };
 
       const getAllDrinks = async () => {
@@ -128,153 +150,30 @@
       };
 
       onMounted(getAllDrinks)
+      onMounted(async () => {
+        if (!servicesDB.services.length) {
+          await getAllServicesDB();
+        }
+      });
+      onMounted(getAllServicesDB)
 
       return {
         packages,
         onSwiper,
         selectPackage,
-        drinksByType
+        drinksByType,
+        services
       };
     },
     data() {
       return {
         swiperOptions: {
-          slidesPerView: 1,
+          slidesPerView: 4,
           spaceBetween: 30,
+          freeMode: true
         },
-        // packages: ['Package 1', 'Package 2', 'Package 3', 'Package 4'],
         selectedDrinks: [],
-        drinks: [
-            {
-              name: 'Tropical Fusion', 
-              value: 'drink1',
-              image: '/tropical_fusion.png',
-              description: ' Tall, clear glass filled with a vibrant mixture of orange, yellow, and red hues, representing the tropical flavors. The drink is garnished with a slice of orange and a cherry on top. The glass is surrounded by small drops of condensation, indicating its chilled nature. The background features a sandy beach and the silhouette of a palm tree, enhancing the tropical ambiance.'
-            },
-            {
-              name: 'Tamarind Echo', 
-              value: 'drink2',
-              image: '/tamarind_echo.png',
-              description: ' There\'s a twist of lemon peel on the rim of the glass. Beside the glass, there\'s a bowl of tamarind pods, showcasing the primary ingredient. The setting is on a rustic wooden table with ambient lighting from above, casting a soft shadow beneath the glass.'
-            },
-            {
-              name: 'Guava Groove', 
-              value: 'drink3',
-              image: '/guava_groove.png',
-              description: ' The drink is garnished with a thin slice of guava and a sprig of mint. The glass sits on a white ceramic coaster, and there are a few whole guavas and cut halves around the glass, emphasizing the primary ingredient. The background is a light pastel pink, complementing the drink\'s color and giving a refreshing feel.'
-            },
-            {
-              name: 'Fruitful Vino', 
-              value: 'drink4',
-              image: '/fruitful_vino.png',
-              description: ' an elegant wine glass filled with a deep purple-red wine that captures the richness of various fruits. Floating on the surface are tiny pieces of diced fruits like apple, grape, and berry. The base of the glass rests on a dark wooden table. In the background, there\'s a bottle of wine with a label that reads \"Fruitful Vino\" and a bowl of mixed fruits that have been used in the wine.'
-            },
-            {
-              name: 'Pineapple Serenade', 
-              value: 'drink5',
-              image: '/pineapple_serenade.png',
-              description: '  The drink is bubbly, with small effervescent bubbles rising to the surface. It\'s garnished with a triangular slice of fresh pineapple on the rim and a curly straw. The glass is set on a bamboo mat, and behind it, there\'s a whole pineapple with its leafy crown and a backdrop of a serene beach sunset, creating a harmonious and tropical ambiance.'
-            },
-        ],
-        services: [
-            {
-                title: 'SIMPLE GLASS',
-                description: [
-                    'Description: Perfect for those on a budget, the Simple Glass tier offers essential bar services with a selection of 2 specialty drinks.',
-                    'Suitable for events with up to 50 guests',
-                    'Included Services:',
-                    '- 1 Professional bartender',
-                    '- 3-hour service',
-                    '- 2 specialty drinks',
-                    '- Bar menu displayed',
-                    '- Mixers',
-                    '- Garnishes',
-                    '- Ice & cooling',
-                    '- Napkins, straws, & cups',
-                    '- Setup and cleanup',
-                    '*PACKAGE DOES NOT INCLUDE ALCOHOL'
-                ],
-                image: '/simple_glass.png',
-                drinkLimit: 2
-            },
-            {
-                title: 'PREMIUM GLASS',
-                description: [
-                  'Description: Elevate your event',
-                  'with our Premium Glass tier,',
-                  'featuring a broader selection of 3',
-                  'specialty drinks and upgraded',
-                  'service. Ideal for events with up to',
-                  '100 guests',
-                  'Included Services:',
-                  '- 2 Professional bartenders',
-                  '- 3-hour service',
-                  '- 3 specialty drinks',
-                  '- Bar equipment',
-                  '- Bar menu displayed',
-                  '- Bar condiments',
-                  '- Mixers',
-                  '- Garnishes',
-                  '- Ice & cooling',
-                  '- Napkins, straws, & cups',
-                  '- Setup and cleanup',
-                  '*PACKAGE DOES NOT INCLUDE ALCOHOL'
-                ],
-                image: '/premium_glass.png',
-                drinkLimit: 3
-            },
-            {
-                title: 'SIGNATURE GLASS',
-                description: [
-                  'Description: The ultimate',
-                  'experience for those who want to',
-                  'impress their guests with a wide',
-                  'range of premium drinks and top-',
-                  'notch service. Suitable for larger',
-                  'events with up to 150 guests',
-                  'Included Services:',
-                  '- 2 Professional bartenders',
-                  '- 3-hour service',
-                  '- 5 specialty drinks',
-                  '- Unique serving presentations',
-                  '- Bar equipment',
-                  '- Custom cocktail menu tailored to your event',
-                  '- Bar condiments',
-                  '- Mixers',
-                  '- Garnishes',
-                  '- Ice & cooling',
-                  '- Napkins, straws, & cups',
-                  '- Setup and cleanup',
-                  '*PACKAGE DOES NOT INCLUDE ALCOHOL'
-                ],
-                image: '/signature_glass.png',
-                drinkLimit: 5
-            },
-            {
-                title: 'THE "OPEN GLASS"',
-                description: [
-                  'Description: For the most exclusive',
-                  'and personalized bar experience,',
-                  'choose our Glass tier. We\'ll work',
-                  'closely with you to create a one-',
-                  'of-a-kind bar experience that',
-                  'matches your event\'s theme and',
-                  'requirements. Pricing varies based',
-                  'on customization. Tailored to the',
-                  'specific needs of your event,',
-                  'accommodating even the largest',
-                  'gatherings.',
-                  '- Customizable service',
-                  '*We will provide a consultation to',
-                  'discuss your requirements and',
-                  'provide you with a customized',
-                  'quote.'
-                ],
-                image: '/open_glass.png',
-                drinkLimit: 5
-            }
-        ],
-
+        drinks: [],
         selectedService: null,
         selectedDate: null,
         selectedTime: null,
@@ -324,6 +223,9 @@
           this.selectedDrinks.push(drinkValue);
         }
       },
+      handleDateChange(newDate) {
+        this.selectedDate = newDate;
+      },
       removeDrink(drinkValue) {
         const index = this.selectedDrinks.indexOf(drinkValue);
         if (index !== -1) {
@@ -343,7 +245,8 @@
               case 'SIGNATURE GLASS':
                   paymentUrl = 'https://buy.stripe.com/test_cN28xh9IleQ9dQQ5kn';
                   break;
-              case 'THE "OPEN GLASS"':
+              case 'THE OPEN GLASS':
+                  console.log('CJ this is the selectedService: ', this.selectedService.title)
                   paymentUrl = 'https://buy.stripe.com/test_eVaeVFf2FgYh288bIM';
                   break;
               default:

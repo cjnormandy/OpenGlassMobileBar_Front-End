@@ -31,7 +31,7 @@ const calculatedResults = computed(() => {
             drinksPerGuestPerHour = 2;
             break;
         default:
-            drinksPerGuestPerHour = 1; // default to Average Drinkers
+            drinksPerGuestPerHour = 1;
     }
 
     const totalDrinks = totalGuests.value * (drinkPercentage.value / 100) * drinksPerGuestPerHour * hours.value;
