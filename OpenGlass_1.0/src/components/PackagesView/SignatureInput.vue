@@ -1,6 +1,6 @@
 <template>
     <div>
-      <customer-form :selectedDate="selectedDate" :amt="serviceAmt"/>
+      <customer-form :selectedDate="selectedDate" :amt="serviceAmt" :serv_id="serv_id"/>
       <input v-if="isEditing" type="text" :value="signatureName" @blur="isEditing = false" class="mt-1 p-2 rounded-md shadow-sm bg-white" placeholder="Type your name here" ref="signatureInput" />
     </div>
   </template>
@@ -12,7 +12,8 @@
     props: {
       signatureName: String,
       selectedDate: String,
-      serviceAmt: String
+      serviceAmt: String,
+      serv_id: String
     },
     components: {
     VuePdfEmbed,

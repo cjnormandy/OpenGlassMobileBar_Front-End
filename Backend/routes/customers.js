@@ -83,4 +83,21 @@ module.exports = ({ app, db }) => {
             return res.status(200).json(results[0]);
         });
     });
+
+    // Get a customer by Phone
+    app.get('/customers/by-phone/:phone', (req, res) => {
+        const phone = req.params.phone;
+        const getQuery = 'SELECT * FROM Customers WHERE phone = ?';
+
+        db.query(getQuery, [phone], (error, results) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json({ message: 'Internal server error' });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'Customer not found' });
+            }
+            return res.status(200).json(results[0]);
+        });
+    });
 };

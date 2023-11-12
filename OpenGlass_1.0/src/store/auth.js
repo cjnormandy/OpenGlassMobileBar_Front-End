@@ -12,7 +12,7 @@ export const useAuthStore = defineStore({
     strategies: [
       {
         key: 'auth',
-        storage: localStorage,
+        storage: sessionStorage,
       },
     ],
   },

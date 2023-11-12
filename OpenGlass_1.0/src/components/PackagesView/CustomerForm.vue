@@ -65,8 +65,11 @@
   <script>
   import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
   import fontkit from '@pdf-lib/fontkit';
+
+  import { usePaymentStore } from '../../store/payments';
+
   export default {
-    props: {selectedDate: null, amt: null},
+    props: {selectedDate: null, amt: null, serv_id: null},
     data() {
       return {
         formData: {
@@ -84,10 +87,26 @@
     methods: {
       submitForm() {
         this.modifyPDF();
+        this.addNewPayment();
       },
       onSignatureChange(e) {
         const signatureText = e.target.value;
         this.formData.signature = signatureText;
+      },
+      addNewPayment() {
+        const paymentData = {
+          first_name: this.formData.firstName,
+          last_name: this.formData.lastName,
+          birthday: this.formData.dob,
+          phone: this.formData.phone,
+          email: this.formData.email
+        }
+        const tranactionData = {
+          service_id: this.serv_id,
+          payment_type: "Stripe"
+        }
+        const paymentStore = usePaymentStore();
+        paymentStore.addCustomer(paymentData, tranactionData);
       },
       async modifyPDF() {
         const pdfDoc = await PDFDocument.create()
