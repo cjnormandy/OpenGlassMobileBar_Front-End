@@ -54,6 +54,8 @@ module.exports = ({ app, db }) => {
     });
 
 
+
+
     function customerExists(customerID, callback) {
         const checkCustomerQuery = 'SELECT * FROM Customers WHERE customer_id = ?';
       
@@ -159,7 +161,7 @@ module.exports = ({ app, db }) => {
                         return callback(err, null);
                     }
                     const addressID = result.insertId;
-                    console.log(result.insertId);
+
                     return callback(null, addressID);
                 });
             }
@@ -204,12 +206,17 @@ module.exports = ({ app, db }) => {
     }
 
 
+
+
     app.post('/createEvent', (req, res) => {
         const { name, desc, street, city, state_name, state, zipcode, county, employeeID, start, end, date, customerID, orderID, paymentID, payment_status } = req.body;
         const createParams = [];
 
         if (!name || !desc || !street || !city || !state_name || !state || !zipcode || !county || !employeeID || !start || !end || !date || !customerID || !orderID || !paymentID || !payment_status) {
             return res.status(400).json({ message: 'All fields are required to add an order to the database.' });
+        }
+        if (state.length != 2) {
+            return res.status(400).json({ message: `The state abbreviation input needs to be the state's abbreviation not the entire name of the state. Ex: TX for the state Texas.` });
         }
         if (!isValidDateFormat(date)) {
             return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD format when entering in an event date.' });
@@ -283,7 +290,7 @@ module.exports = ({ app, db }) => {
                                         return res.status(500).json({ message: 'Error checking if address exists' });
                                     }
                                     address_id = newAddressID;
-                                    console.log(newAddressID);
+
                                     const createEventQuery = `INSERT INTO Customer_Events (event_name, event_description, address_id, employee_id, event_start_time, event_end_time, event_date, 
                                         customer_id, order_details_id, payment_id, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                                     createParams.push(name);
@@ -314,5 +321,923 @@ module.exports = ({ app, db }) => {
     });
 
 
+
+
+    //updates everything in the customer_events table except the address_id which is done in the api below
+    app.put('/updateEvent/:event_id', (req, res) => {
+        const { name, desc, employeeID, start, end, date, customerID, orderID, paymentID, payment_status } = req.body;
+        const eventID = req.params.event_id;
+        let updateEventQuery = 'UPDATE Customer_Events SET ';
+        const queryParams = [];
+
+        if (!name && !desc && !employeeID && !start && !end && !date && !customerID && !orderID && !paymentID && !payment_status) {
+            return res.status(400).json({ message: 'At least one field is required to update an order in the database.' });
+        }
+
+        if (name) {
+            updateEventQuery += 'event_name = ?, ';
+            queryParams.push(name);
+        }
+        if (desc) {
+            updateEventQuery += 'event_description = ?, ';
+            queryParams.push(desc);
+        }
+        if (start) {
+            updateEventQuery += 'event_start_time = ?, ';
+            queryParams.push(start);
+        }
+        if (end) {
+            updateEventQuery += 'event_end_time = ?, ';
+            queryParams.push(end);
+        }
+        if (date) {
+            if (!isValidDateFormat(date)) {
+                return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD format when entering in an invoice date.' });
+            }
+            else {
+                updateEventQuery += 'event_date = ?, ';
+                queryParams.push(date);
+            }
+        }
+        if (payment_status) {
+            if (payment_status != "Paid" && payment_status != "Unpaid") {
+                return res.status(400).json({ message: `The payment status can only be Paid or Unpaid. Please enter in a correct payment status and try again.`});
+            }
+            else {
+                updateEventQuery += 'payment_status = ?, ';
+                queryParams.push(payment_status);
+            }
+        }
+        if (employeeID && !customerID && !orderID && !paymentID) {
+            employeeExists(employeeID, (err, employeeExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if employee exists' });
+                }
+                if (!employeeExists) {
+                    return res.status(404).json({ message: 'Employee not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'employee_id = ?, ';
+                    queryParams.push(employeeID);
+
+                    updateEventQuery = updateEventQuery.slice(0, -2);
+                    updateEventQuery += ' WHERE event_id = ?';
+                    queryParams.push(eventID);
+
+                    db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                        if (error) {
+                            console.log(error);
+                            return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                        }
+                        if (eventResults.affectedRows === 0) {
+                            return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                        }
+                        return res.status(200).json({ message: 'Event updated successfully'});
+                    });
+                }
+            });
+        }
+        if (employeeID && customerID && !orderID && !paymentID) {
+            employeeExists(employeeID, (err, employeeExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if employee exists' });
+                }
+                if (!employeeExists) {
+                    return res.status(404).json({ message: 'Employee not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'employee_id = ?, ';
+                    queryParams.push(employeeID);
+
+                    customerExists(customerID, (err, customerExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if customer exists.'})
+                        }
+                        if (!customerExists) {
+                            return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'customer_id = ?, ';
+                            queryParams.push(customerID);
+        
+                            updateEventQuery = updateEventQuery.slice(0, -2);
+                            updateEventQuery += ' WHERE event_id = ?';
+                            queryParams.push(eventID);
+        
+                            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                if (error) {
+                                    console.log(error);
+                                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                }
+                                if (eventResults.affectedRows === 0) {
+                                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                }
+                                return res.status(200).json({ message: 'Event updated successfully'});
+                            }); 
+                        }
+                    });
+                }
+            });
+        }
+        if (employeeID && customerID && orderID && !paymentID) {
+            employeeExists(employeeID, (err, employeeExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if employee exists' });
+                }
+                if (!employeeExists) {
+                    return res.status(404).json({ message: 'Employee not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'employee_id = ?, ';
+                    queryParams.push(employeeID);
+
+                    customerExists(customerID, (err, customerExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if customer exists.'})
+                        }
+                        if (!customerExists) {
+                            return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'customer_id = ?, ';
+                            queryParams.push(customerID);
+
+                            orderExists(orderID, (err, orderExists) => {
+                                if (err) {
+                                    return res.status(500).json({ message: 'Error checking if order exists.'})
+                                }
+                                if (!orderExists) {
+                                    return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                                }
+                                else {
+                                    updateEventQuery += 'order_details_id = ?, ';
+                                    queryParams.push(orderID);
+
+                                    updateEventQuery = updateEventQuery.slice(0, -2);
+                                    updateEventQuery += ' WHERE event_id = ?';
+                                    queryParams.push(eventID);
+                
+                                    db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                        if (error) {
+                                            console.log(error);
+                                            return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                        }
+                                        if (eventResults.affectedRows === 0) {
+                                            return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                        }
+                                        return res.status(200).json({ message: 'Event updated successfully'});
+                                    }); 
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        if (employeeID && customerID && orderID && paymentID) {
+            employeeExists(employeeID, (err, employeeExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if employee exists' });
+                }
+                if (!employeeExists) {
+                    return res.status(404).json({ message: 'Employee not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'employee_id = ?, ';
+                    queryParams.push(employeeID);
+
+                    customerExists(customerID, (err, customerExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if customer exists.'})
+                        }
+                        if (!customerExists) {
+                            return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'customer_id = ?, ';
+                            queryParams.push(customerID);
+
+                            orderExists(orderID, (err, orderExists) => {
+                                if (err) {
+                                    return res.status(500).json({ message: 'Error checking if order exists.'})
+                                }
+                                if (!orderExists) {
+                                    return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                                }
+                                else {
+                                    updateEventQuery += 'order_details_id = ?, ';
+                                    queryParams.push(orderID);
+
+                                    paymentExists(paymentID, (err, payExists) => {
+                                        if (err) {
+                                            return res.status(500).json({ message: 'Error checking if payment exists.'})
+                                        }
+                                        if (!payExists) {
+                                            return res.status(404).json({ message: 'Payment not found, no update was completed.' });
+                                        }
+                                        else {
+                                            updateEventQuery += 'payment_id = ?, ';
+                                            queryParams.push(paymentID);
+
+                                            updateEventQuery = updateEventQuery.slice(0, -2);
+                                            updateEventQuery += ' WHERE event_id = ?';
+                                            queryParams.push(eventID);
+                        
+                                            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                                if (error) {
+                                                    console.log(error);
+                                                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                                }
+                                                if (eventResults.affectedRows === 0) {
+                                                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                                }
+                                                return res.status(200).json({ message: 'Event updated successfully'});
+                                            }); 
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        if (employeeID && orderID && !customerID && !paymentID) {
+            employeeExists(employeeID, (err, employeeExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if employee exists' });
+                }
+                if (!employeeExists) {
+                    return res.status(404).json({ message: 'Employee not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'employee_id = ?, ';
+                    queryParams.push(employeeID);
+
+                    orderExists(orderID, (err, orderExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if order exists.'})
+                        }
+                        if (!orderExists) {
+                            return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'order_details_id = ?, ';
+                            queryParams.push(orderID);
+        
+                            updateEventQuery = updateEventQuery.slice(0, -2);
+                            updateEventQuery += ' WHERE event_id = ?';
+                            queryParams.push(eventID);
+        
+                            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                if (error) {
+                                    console.log(error);
+                                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                }
+                                if (eventResults.affectedRows === 0) {
+                                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                }
+                                return res.status(200).json({ message: 'Event updated successfully'});
+                            }); 
+                        }
+                    });
+                }
+            });
+        }
+        if (employeeID && orderID && paymentID && !customerID) {
+            employeeExists(employeeID, (err, employeeExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if employee exists' });
+                }
+                if (!employeeExists) {
+                    return res.status(404).json({ message: 'Employee not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'employee_id = ?, ';
+                    queryParams.push(employeeID);
+
+                    orderExists(orderID, (err, orderExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if order exists.'})
+                        }
+                        if (!orderExists) {
+                            return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'order_details_id = ?, ';
+                            queryParams.push(orderID);
+
+                            paymentExists(paymentID, (err, payExists) => {
+                                if (err) {
+                                    return res.status(500).json({ message: 'Error checking if payment exists.'})
+                                }
+                                if (!payExists) {
+                                    return res.status(404).json({ message: 'Payment not found, no update was completed.' });
+                                }
+                                else {
+                                    updateEventQuery += 'payment_id = ?, ';
+                                    queryParams.push(paymentID);
+
+                                    updateEventQuery = updateEventQuery.slice(0, -2);
+                                    updateEventQuery += ' WHERE event_id = ?';
+                                    queryParams.push(eventID);
+                
+                                    db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                        if (error) {
+                                            console.log(error);
+                                            return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                        }
+                                        if (eventResults.affectedRows === 0) {
+                                            return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                        }
+                                        return res.status(200).json({ message: 'Event updated successfully'});
+                                    }); 
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        if (employeeID && paymentID && !customerID && !orderID) {
+            employeeExists(employeeID, (err, employeeExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if employee exists' });
+                }
+                if (!employeeExists) {
+                    return res.status(404).json({ message: 'Employee not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'employee_id = ?, ';
+                    queryParams.push(employeeID);
+
+                    paymentExists(paymentID, (err, payExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if payment exists.'})
+                        }
+                        if (!payExists) {
+                            return res.status(404).json({ message: 'Payment not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'payment_id = ?, ';
+                            queryParams.push(paymentID);
+        
+                            updateEventQuery = updateEventQuery.slice(0, -2);
+                            updateEventQuery += ' WHERE event_id = ?';
+                            queryParams.push(eventID);
+        
+                            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                if (error) {
+                                    console.log(error);
+                                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                }
+                                if (eventResults.affectedRows === 0) {
+                                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                }
+                                return res.status(200).json({ message: 'Event updated successfully'});
+                            }); 
+                        }
+                    });
+                }
+            });
+        }
+        if (customerID && orderID && !employeeID && !paymentID) {
+            customerExists(customerID, (err, customerExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if customer exists' });
+                }
+                if (!customerExists) {
+                    return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'customer_id = ?, ';
+                    queryParams.push(customerID);
+
+                    orderExists(orderID, (err, orderExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if order exists.'})
+                        }
+                        if (!orderExists) {
+                            return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'order_details_id = ?, ';
+                            queryParams.push(orderID);
+        
+                            updateEventQuery = updateEventQuery.slice(0, -2);
+                            updateEventQuery += ' WHERE event_id = ?';
+                            queryParams.push(eventID);
+        
+                            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                if (error) {
+                                    console.log(error);
+                                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                }
+                                if (eventResults.affectedRows === 0) {
+                                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                }
+                                return res.status(200).json({ message: 'Event updated successfully'});
+                            }); 
+                        }
+                    });
+                }
+            });
+        }
+        if (customerID && orderID && paymentID && !employeeID) {
+            customerExists(customerID, (err, customerExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if customer exists' });
+                }
+                if (!customerExists) {
+                    return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'customer_id = ?, ';
+                    queryParams.push(customerID);
+
+                    orderExists(orderID, (err, orderExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if order exists.'})
+                        }
+                        if (!orderExists) {
+                            return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'order_details_id = ?, ';
+                            queryParams.push(orderID);
+
+                            paymentExists(paymentID, (err, payExists) => {
+                                if (err) {
+                                    return res.status(500).json({ message: 'Error checking if payment exists.'})
+                                }
+                                if (!payExists) {
+                                    return res.status(404).json({ message: 'Payment not found, no update was completed.' });
+                                }
+                                else {
+                                    updateEventQuery += 'payment_id = ?, ';
+                                    queryParams.push(paymentID);
+
+                                    updateEventQuery = updateEventQuery.slice(0, -2);
+                                    updateEventQuery += ' WHERE event_id = ?';
+                                    queryParams.push(eventID);
+                
+                                    db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                        if (error) {
+                                            console.log(error);
+                                            return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                        }
+                                        if (eventResults.affectedRows === 0) {
+                                            return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                        }
+                                        return res.status(200).json({ message: 'Event updated successfully'});
+                                    });
+                                }
+                            });
+                        }
+                    }); 
+                }
+            });
+        }
+        if (customerID && paymentID && !employeeID && !orderID) {
+            customerExists(customerID, (err, customerExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if customer exists' });
+                }
+                if (!customerExists) {
+                    return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'customer_id = ?, ';
+                    queryParams.push(customerID);
+
+                    paymentExists(paymentID, (err, payExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if payment exists.'})
+                        }
+                        if (!payExists) {
+                            return res.status(404).json({ message: 'Payment not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'payment_id = ?, ';
+                            queryParams.push(paymentID);
+        
+                            updateEventQuery = updateEventQuery.slice(0, -2);
+                            updateEventQuery += ' WHERE event_id = ?';
+                            queryParams.push(eventID);
+        
+                            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                if (error) {
+                                    console.log(error);
+                                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                }
+                                if (eventResults.affectedRows === 0) {
+                                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                }
+                                return res.status(200).json({ message: 'Event updated successfully'});
+                            }); 
+                        }
+                    });
+                }
+            });
+        }
+        if (orderID && paymentID && !employeeID && !customerID) {
+            orderExists(orderID, (err, orderExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if order exists.'})
+                }
+                if (!orderExists) {
+                    return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'order_details_id = ?, ';
+                    queryParams.push(orderID);
+
+                    paymentExists(paymentID, (err, payExists) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error checking if payment exists.'})
+                        }
+                        if (!payExists) {
+                            return res.status(404).json({ message: 'Payment not found, no update was completed.' });
+                        }
+                        else {
+                            updateEventQuery += 'payment_id = ?, ';
+                            queryParams.push(paymentID);
+
+                            updateEventQuery = updateEventQuery.slice(0, -2);
+                            updateEventQuery += ' WHERE event_id = ?';
+                            queryParams.push(eventID);
+        
+                            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                                if (error) {
+                                    console.log(error);
+                                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                                }
+                                if (eventResults.affectedRows === 0) {
+                                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                                }
+                                return res.status(200).json({ message: 'Event updated successfully'});
+                            });
+                        }
+                    });
+                }
+            }); 
+        }
+        if (customerID && !employeeID && !orderID && !paymentID) {
+            customerExists(customerID, (err, customerExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if customer exists' });
+                }
+                if (!customerExists) {
+                    return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'customer_id = ?, ';
+                    queryParams.push(customerID);
+
+                    updateEventQuery = updateEventQuery.slice(0, -2);
+                    updateEventQuery += ' WHERE event_id = ?';
+                    queryParams.push(eventID);
+
+                    db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                        if (error) {
+                            console.log(error);
+                            return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                        }
+                        if (eventResults.affectedRows === 0) {
+                            return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                        }
+                        return res.status(200).json({ message: 'Event updated successfully'});
+                    });
+                }
+            });        
+        }
+        if (orderID && !employeeID && !customerID && !paymentID) {
+            orderExists(orderID, (err, orderExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if order exists' });
+                }
+                if (!orderExists) {
+                    return res.status(404).json({ message: 'Order not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'order_details_id = ?, ';
+                    queryParams.push(orderID);
+
+                    updateEventQuery = updateEventQuery.slice(0, -2);
+                    updateEventQuery += ' WHERE event_id = ?';
+                    queryParams.push(eventID);
+
+                    db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                        if (error) {
+                            console.log(error);
+                            return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                        }
+                        if (eventResults.affectedRows === 0) {
+                            return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                        }
+                        return res.status(200).json({ message: 'Event updated successfully'});
+                    });
+                }
+            });
+        }
+        if (paymentID && !employeeID && !customerID && !orderID) {
+            paymentExists(paymentID, (err, payExists) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error checking if payment exists' });
+                }
+                if (!payExists) {
+                    return res.status(404).json({ message: 'Payment not found, no update was completed.' });
+                }
+                else {
+                    updateEventQuery += 'payment_id = ?, ';
+                    queryParams.push(paymentID);
+
+                    updateEventQuery = updateEventQuery.slice(0, -2);
+                    updateEventQuery += ' WHERE event_id = ?';
+                    queryParams.push(eventID);
+
+                    db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                        if (error) {
+                            console.log(error);
+                            return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                        }
+                        if (eventResults.affectedRows === 0) {
+                            return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                        }
+                        return res.status(200).json({ message: 'Event updated successfully'});
+                    });
+                }
+            });
+        }
+        if (!employeeID && !customerID && !orderID && !paymentID) {
+            updateEventQuery = updateEventQuery.slice(0, -2);
+            updateEventQuery += ' WHERE event_id = ?';
+            queryParams.push(eventID);
+
+            db.query(updateEventQuery, queryParams, (error, eventResults) => {
+                if (error) {
+                    console.log(error);
+                    return res.status(500).json({ message: 'Error updating the event details in the database.' });
+                }
+                if (eventResults.affectedRows === 0) {
+                    return res.status(404).json({ message: 'Event not found, no update was completed.' });
+                }
+                return res.status(200).json({ message: 'Event updated successfully'});
+            });
+        }
+
+    });
+
+
+
+    // only updates the events address
+    app.put('/updateEventAddress/:event_id', (req, res) => {
+        const { street, city, state_name, state, zipcode, county, customerID } = req.body;
+        const eventID = req.params.event_id;
+        let updateAddressQuery = 'UPDATE Address SET ';
+        const queryParams = [];
+
+        if (!street && !city && !state_name && !state && !zipcode && !county && !customerID) {
+            return res.status(400).json({ message: 'At least one field is required to update an event address in the database.' });
+        }
+        if (state_name && !state) {
+            return res.status(400).json({ message: `Cannot only enter the state's name, please enter the state's abbreviation as well as the state's name and try again.` });
+        }
+
+        const getAddressID = 'SELECT * FROM Customer_Events WHERE event_id = ?';
+        db.query(getAddressID, [eventID], (error, getResults) => {
+            if (error) {
+                return res.status(500).json({ message: 'Error retrieving the address_id of this event.' });
+            }
+            if (getResults.length === 0) {
+                return res.status(404).json({ message: 'Event not found, no update was completed.' });
+            }
+            const addressID = getResults[0].address_id;
+
+            if (street) {
+                updateAddressQuery += 'street = ?, ';
+                queryParams.push(street);
+            }
+            if (city) {
+                updateAddressQuery += 'city = ?, ';
+                queryParams.push(city);
+            }
+            if (zipcode) {
+                updateAddressQuery += 'zipcode = ?, ';
+                queryParams.push(zipcode);
+            }
+            if (county) {
+                updateAddressQuery += 'county = ?, ';
+                queryParams.push(county);
+            }
+            if (state && !customerID) {
+                if (state.length != 2) {
+                    return res.status(400).json({ message: `The state abbreviation input needs to be the state's abbreviation not the entire name of the state. Ex: TX for the state Texas.` });
+                }
+                stateExists(state, (err, exists, state_id) => {
+                    if (err) {
+                        return res.status(500).json({ message: 'Error checking the states existence.' });
+                    }
+                    if (exists) {
+                        const stateID = state_id;
+                        updateAddressQuery += 'state_id = ?, ';
+                        queryParams.push(stateID);
+
+                        updateAddressQuery = updateAddressQuery.slice(0, -2);
+                        updateAddressQuery += ' WHERE address_id = ?';
+                        queryParams.push(addressID);
+
+                        db.query(updateAddressQuery, queryParams, (error, updateResults) => {
+                            if (error) {
+                                return res.status(500).json({ message: 'Error updating the address of this event.' });
+                            }
+                            return res.status(200).json({ message: 'Event address successfully updated' });
+                        });
+                    }
+                    else {
+                        if (!state_name) {
+                            return res.status(400).json({ message: `This state does not exist in the database, so please enter the state's name as well as the state's abbreviation and try again.` });
+                        }
+                        createState(state_name, state, (err, newStateID) => {
+                            if (err) {
+                                return res.status(500).json({ message: 'Error creating a new state entry.' });
+                            }
+                            const newState = newStateID;
+
+                            updateAddressQuery += 'state_id = ?, ';
+                            queryParams.push(newState);
+    
+                            updateAddressQuery = updateAddressQuery.slice(0, -2);
+                            updateAddressQuery += ' WHERE address_id = ?';
+                            queryParams.push(addressID);
+
+                            db.query(updateAddressQuery, queryParams, (error, updateResults) => {
+                                if (error) {
+                                    return res.status(500).json({ message: 'Error updating the address of this event.' });
+                                }
+                                return res.status(200).json({ message: 'Event address successfully updated' });
+                            });
+                        });
+                    }   
+                });
+            }
+            if (customerID && !state) {
+                customerExists(customerID, (err, customerExists) => {
+                    if (err) {
+                        return res.status(500).json({ message: 'Error checking if customer exists' });
+                    }
+                    if (!customerExists) {
+                        return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                    }
+                    else {
+                        updateAddressQuery += 'customer_id = ?, ';
+                        queryParams.push(customerID);
+    
+                        updateAddressQuery = updateAddressQuery.slice(0, -2);
+                        updateAddressQuery += ' WHERE address_id = ?';
+                        queryParams.push(addressID);
+    
+                        db.query(updateAddressQuery, queryParams, (error, updateResults) => {
+                            if (error) {
+                                console.log(error);
+                                return res.status(500).json({ message: 'Error updating the address of this event.' });
+                            }
+                            return res.status(200).json({ message: 'Event address updated successfully'});
+                        });
+                    }
+                }); 
+            }
+            if (state && customerID) {
+                customerExists(customerID, (err, customerExists) => {
+                    if (err) {
+                        return res.status(500).json({ message: 'Error checking if customer exists' });
+                    }
+                    if (!customerExists) {
+                        return res.status(404).json({ message: 'Customer not found, no update was completed.' });
+                    }
+                    else {
+                        updateAddressQuery += 'customer_id = ?, ';
+                        queryParams.push(customerID);
+
+                        if (state.length != 2) {
+                            return res.status(400).json({ message: `The state abbreviation input needs to be the state's abbreviation not the entire name of the state. Ex: TX for the state Texas.` });
+                        }
+                        stateExists(state, (err, exists, state_id) => {
+                            if (err) {
+                                return res.status(500).json({ message: 'Error checking the states existence.' });
+                            }
+                            if (exists) {
+                                const stateID = state_id;
+                                updateAddressQuery += 'state_id = ?, ';
+                                queryParams.push(stateID);
+        
+                                updateAddressQuery = updateAddressQuery.slice(0, -2);
+                                updateAddressQuery += ' WHERE address_id = ?';
+                                queryParams.push(addressID);
+        
+                                db.query(updateAddressQuery, queryParams, (error, updateResults) => {
+                                    if (error) {
+                                        return res.status(500).json({ message: 'Error updating the address of this event.' });
+                                    }
+                                    return res.status(200).json({ message: 'Event address successfully updated' });
+                                });
+                            }
+                            else {
+                                if (!state_name) {
+                                    return res.status(400).json({ message: `This state does not exist in the database, so please enter the state's name as well as the state's abbreviation and try again.` });
+                                }
+                                createState(state_name, state, (err, newStateID) => {
+                                    if (err) {
+                                        return res.status(500).json({ message: 'Error creating a new state entry.' });
+                                    }
+                                    const newState = newStateID;
+        
+                                    updateAddressQuery += 'state_id = ?, ';
+                                    queryParams.push(newState);
+            
+                                    updateAddressQuery = updateAddressQuery.slice(0, -2);
+                                    updateAddressQuery += ' WHERE address_id = ?';
+                                    queryParams.push(addressID);
+        
+                                    db.query(updateAddressQuery, queryParams, (error, updateResults) => {
+                                        if (error) {
+                                            return res.status(500).json({ message: 'Error updating the address of this event.' });
+                                        }
+                                        return res.status(200).json({ message: 'Event address successfully updated' });
+                                    });
+                                });
+                            }   
+                        });
+                    }
+                }); 
+            }
+            if (!state && !customerID) {
+                updateAddressQuery = updateAddressQuery.slice(0, -2);
+                updateAddressQuery += ' WHERE address_id = ?';
+                queryParams.push(addressID);
+
+                db.query(updateAddressQuery, queryParams, (error, updateResults) => {
+                    if (error) {
+                        return res.status(500).json({ message: 'Error updating the address of this event.' });
+                    }
+                    return res.status(200).json({ message: 'Event address successfully updated' });
+                });
+            }
+        });
+    });
+
+
+
+    app.delete('/deleteEvent/:event_id', (req, res) => {
+        const eventID = req.params.event_id;
+
+        const deleteEventQuery = 'DELETE FROM Customer_Events WHERE event_id = ?';
+        db.query(deleteEventQuery, [eventID], (error, delEventResults) => {
+            if (error) {
+                return res.status(500).json({ message: 'Error deleting the event details from the database.' });
+            }
+            if (delEventResults.affectedRows === 0) {
+                return res.status(404).json({ message: 'Event not found.' });                
+            }
+            return res.status(200).json({ message: 'Event details successfully deleted from the database.' });
+        });
+    });
+
+
+
+    app.delete('/deleteEventandAddress/:event_id', (req, res) => {
+        const eventID = req.params.event_id;
+
+        const selectQuery = 'SELECT * FROM Customer_Events WHERE event_id = ?';
+        db.query(selectQuery, [eventID], (error, selectResults) => {
+            if (error) {
+                return res.status(500).json({ message: 'Error selecting the event details to get an address_id to delete.' });
+            }
+            if (selectResults.length === 0) {
+                return res.status(404).json({ message: 'Event not found.' });
+            }
+
+            const addressID = selectResults[0].address_id;
+
+            const deleteEventQuery = 'DELETE FROM Customer_Events WHERE event_id = ?';
+            db.query(deleteEventQuery, [eventID], (error, dEventResults) => {
+                if (error) {
+                    return res.status(500).json({ message: 'Error deleting the event details from the database.' });
+                }
+                const deleteAddyQuery = 'DELETE FROM Address WHERE address_id = ?';
+                db.query(deleteAddyQuery, [addressID], (error, delAddyResults) => {
+                    if (error) {
+                        console.log(error);
+                        return res.status(500).json({ message: 'Error deleting the event and its address from the database.' });
+                    }
+                    if (delAddyResults.affectedRows === 0) {
+                        return res.status(404).json({ message: 'Address not found.' });
+                    }
+                    return res.status(200).json({ message: 'The event details including the address of this event have been deleted from the database.' });
+                });                
+            });
+        });
+    });
 
 }

@@ -33,18 +33,18 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      drinks: [], // Store the list of drinks here
+      drinks: [],
     };
   },
 
   methods: {
     // Fetch drinks data from the backend
     async fetchDrinks() {
-      const backendUrl = 'http://localhost:3000'; // Update with the correct backend URL and port
+      const backendUrl = 'http://localhost:3000';
       const apiUrl = `${backendUrl}/drinks`;
       try {
       const response = await axios.get(apiUrl);
-      this.drinks = response.data; // Update the drinks data property with the response
+      this.drinks = response.data;
       console.log('Response from the server:', response.data);
       } catch (error) {
         console.error('Error fetching drinks:', error);
@@ -53,14 +53,12 @@ export default {
   },
 
   created() {
-    // Call the fetchDrinks method to load drinks data when the component is created
     this.fetchDrinks();
   },
 };
 </script>
 
 <style scoped>
-/* Custom styles for the drink items */
 .bg-cover {
   background-size: cover;
 }

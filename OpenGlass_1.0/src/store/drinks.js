@@ -12,10 +12,10 @@ export const useDrinkStore = defineStore({
           try {
               const response = await axios.get('http://localhost:3000/drinks');
               this.drinks = response.data;
-              return true;  // Success
+              return true;
           } catch (error) {
               console.error('Failed to get drinks:', error.response ? error.response.data : error.message);
-              return false;  // Failure
+              return false;
           }
       }
   },

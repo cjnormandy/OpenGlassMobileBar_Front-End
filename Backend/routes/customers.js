@@ -1,4 +1,4 @@
-module.exports = (app, db) => {
+module.exports = ({ app, db }) => {
     // Get all customers
     app.get('/customers', (req, res) => {
         const getQuery = 'SELECT * FROM Customers';
