@@ -6,6 +6,9 @@
                 <div class="subtitle">{{ drink.drink_type }}</div>
                 <div class="p-20">
                     <p class="font-semibold">{{ drink.drink_description }}</p>
+                    <div class="p-3">
+                      <button class="bg-gradient-to-r from-transparent-500 to-orange-500 w-full sm:w-32 py-2">Edit</button>
+                    </div>
                 </div>
                 <div>
                     <input 
