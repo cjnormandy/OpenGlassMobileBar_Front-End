@@ -13,10 +13,10 @@ module.exports = ({ app, db }) => {
 
     // Create a new employee
     app.post('/Addemployees', (req, res) => {
-        const { first_name, last_name, phone, email, employee_role } = req.body;
+        const { e_first_name, e_last_name, phone, email, employee_role } = req.body;
         const insertQuery = 'INSERT INTO Employees (e_first_name, e_last_name, phone, email, employee_role, employee_status) VALUES (?, ?, ?, ?, ?, ?)';
 
-        db.query(insertQuery, [first_name, last_name, phone, email, employee_role, 'Active'], (error, results) => {
+        db.query(insertQuery, [e_first_name, e_last_name, phone, email, employee_role, 'Active'], (error, results) => {
             if (error) {
                 console.log(error);
                 return res.status(500).json({ message: 'Internal server error' });
@@ -28,17 +28,17 @@ module.exports = ({ app, db }) => {
     // Update an employee by ID
     app.put('/Updateemployees/:id', (req, res) => {
         const id = req.params.id;
-        const { first_name, last_name, phone, email, employee_role } = req.body;
+        const { e_first_name, e_last_name, phone, email, employee_role } = req.body;
 
         // Create an object to hold the fields to update
         const updateFields = {};
 
-        if (first_name) {
-            updateFields.first_name = first_name;
+        if (e_first_name) {
+            updateFields.e_first_name = e_first_name;
         }
 
-        if (last_name) {
-            updateFields.last_name = last_name;
+        if (e_last_name) {
+            updateFields.e_last_name = e_last_name;
         }
 
         if (phone) {
@@ -69,7 +69,7 @@ module.exports = ({ app, db }) => {
     });
 
     // Soft Delete (Deactivate) an employee by ID
-    app.delete('/employees/:id', (req, res) => {
+    app.put('/employees/:id', (req, res) => {
         const id = req.params.id;
 
         const updateQuery = 'UPDATE Employees SET employee_status=? WHERE employee_id=?';
