@@ -75,11 +75,7 @@
                                 <input v-else v-model="editedEvent.event_name" placeholder="Name" />
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
-                                <!-- Display or edit 'Description' -->
-                                <template v-if="editingEventId !== event.event_id">
-                                    {{ event.event_description }}
-                                </template>
-                                <input v-else v-model="editedEvent.event_description" placeholder="Description" />
+                                {{ event.order_description }}
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
                                 {{ event.event_date }}
@@ -91,7 +87,7 @@
                                 {{ event.event_end_time }}
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
-                                {{ event.location }}
+                                {{ event.county }}
                             </td>
                             <td class="px-6 py-4 whitespace-no-wrap border-r border-gray-200">
                                 {{ event.customer_id }}
@@ -195,6 +191,7 @@ export default {
             try {
                 const response = await axios.get(apiUrl);
                 this.events = response.data;
+                console.log('CJ this is events data: ', response.data)
             } catch (error) {
                 console.error('Error fetching events:', error);
             }

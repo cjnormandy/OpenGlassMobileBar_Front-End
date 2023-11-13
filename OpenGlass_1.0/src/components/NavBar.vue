@@ -9,7 +9,6 @@ const navigation = [
   { name: 'Packages', href: '/packages' },
   { name: 'About Us', href: '/about' },
   { name: 'FAQ', href: '/faq' },
-  { name: 'Events', href: '/events' },
 ]
 
 const auth = useAuthStore();
@@ -36,6 +35,7 @@ const mobileMenuOpen = ref(false)
       <div class="hidden lg:flex lg:gap-x-12">
         <a v-for="item in navigation" :key="item.name" :href="item.href"
           class="text-lg font-semibold leading-6 text-gray-900">{{ item.name }}</a>
+        <a href="/events" v-if="isAuthenticated" class="text-lg font-semibold leading-6 text-gray-900">Events</a>
         <a href="/orders" v-if="isAuthenticated" class="text-lg font-semibold leading-6 text-gray-900">Orders</a>
         <a href="/inventory" v-if="isAuthenticated" class="text-lg font-semibold leading-6 text-gray-900">Inventory</a>
       </div>
@@ -64,6 +64,8 @@ const mobileMenuOpen = ref(false)
               <a v-for="item in navigation" :key="item.name" :href="item.href"
                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">{{
                   item.name }}</a>
+              <a href="/events" v-if="isAuthenticated"
+                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Events</a>
               <a href="/orders" v-if="isAuthenticated"
                 class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Orders</a>
             </div>
