@@ -10,6 +10,13 @@
             </div>
         </div>
     </div>
+    <!-- Back Button -->
+    <div class="flex justify-start p-4">
+      <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded" @click="goBack">
+        Back
+      </button>
+    </div>
+
     <!-- Jumbotron -->
     <div v-if="!selectedService">
       <div class="font-semibold text-3xl py-4 text-gray-500 hover:text-gray-600">
@@ -50,7 +57,7 @@
           </div>
           <div v-if="selectedTime" class="mt-6">
             <label class="block text-base font-semibold text-gray-700">Please enter your information:</label>
-            <signature-input :signatureName="signatureName" :selectedDate="selectedDate" :service-amt="selectedService.price"></signature-input>
+            <signature-input :signatureName="signatureName" :selectedDate="selectedDate" :service-amt="selectedService.price" :serv_id="selectedService.service_id"></signature-input>
             <div>
               <button class="bg-gradient-to-r from-yellow-500 to-orange-500 w-full sm:w-32 py-2" @click="pay">Pay</button>
             </div>
@@ -101,6 +108,7 @@
       const services = computed(() => {
         return servicesDB.services.map(service => ({
               // Map the service properties to the format expected by your UI
+              service_id: service.service_id,
               title: service.service_name.toUpperCase(),
               description: [
                 `Description: ${service.service_description_1}`,
@@ -115,10 +123,6 @@
 
             }));
       })
-
-      const serviceCosts = computed(() => {
-        return servicesDB.services.map(service => parseFloat(service.service_price));
-      });
       
       const onSwiper = (swiper) => {
         swiperRef.value = swiper
@@ -192,6 +196,12 @@
         },
     },
     methods: {
+      goBack() {
+        this.selectedService = null
+        this.selectedDate = null
+        this.selectedTime = null
+        this.selectedDrinks = []
+      },
       submit () {
         this.$refs.checkoutRef.redirectToCheckout();
       },
@@ -246,7 +256,6 @@
                   paymentUrl = 'https://buy.stripe.com/test_cN28xh9IleQ9dQQ5kn';
                   break;
               case 'THE OPEN GLASS':
-                  console.log('CJ this is the selectedService: ', this.selectedService.title)
                   paymentUrl = 'https://buy.stripe.com/test_eVaeVFf2FgYh288bIM';
                   break;
               default:

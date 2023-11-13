@@ -62,7 +62,13 @@ const router = createRouter({
       path: '/faq',
       name: 'faq',
       component: () => import('../views/FAQView.vue')
-    }
+    },
+    {
+      path: '/events',
+      name: 'events',
+      component: () => import('../views/EventsView.vue'),
+      meta: { requiresAuth: true },
+    },
   ]
 })
 
