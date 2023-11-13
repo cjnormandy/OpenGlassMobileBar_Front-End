@@ -13,10 +13,10 @@ module.exports = ({ app, db }) => {
 
     // Create a new customer
     app.post('/Addcustomers', (req, res) => {
-        const { c_first_name, c_last_name, birthday, phone, email } = req.body;
+        const { first_name, last_name, birthday, phone, email } = req.body;
         const insertQuery = 'INSERT INTO Customers (c_first_name, c_last_name, birthday, phone, email) VALUES (?, ?, ?, ?, ?)';
 
-        db.query(insertQuery, [c_first_name, c_last_name, birthday, phone, email], (error, results) => {
+        db.query(insertQuery, [first_name, last_name, birthday, phone, email], (error, results) => {
             if (error) {
                 console.log(error);
                 return res.status(500).json({ message: 'Internal server error' });
