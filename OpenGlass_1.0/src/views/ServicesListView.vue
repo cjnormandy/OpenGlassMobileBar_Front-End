@@ -33,13 +33,13 @@
             </div>
           </div>
           <!-- Button to Open the Create Drink Modal -->
-          <div class="flex justify-start p-4">
+          <!-- <div class="flex justify-start p-4">
             <button 
               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded" 
               @click="openModal">
               Create Drink
             </button>
-          </div>
+          </div> -->
 
           <!-- Create Drink Modal Component -->
           <CreateDrinkModal v-if="openCreateDrinkModal" @close="openCreateDrinkModal = false" />

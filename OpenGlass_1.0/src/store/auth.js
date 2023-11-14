@@ -39,5 +39,9 @@ export const useAuthStore = defineStore({
             return false;
         }
     },
+    logout() {
+        this.user = null;
+        this.token = null;
+    },
   },
 });
