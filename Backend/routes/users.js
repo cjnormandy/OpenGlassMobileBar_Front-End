@@ -55,7 +55,7 @@ module.exports = ({ app, db }) => {
 
         // Insert into the Employees table
         db.query(
-          'INSERT INTO Employees (first_name, last_name, phone, email, employee_status, employee_role) VALUES (?, ?, ?, ?, ?, ?)',
+          'INSERT INTO Employees (e_first_name, e_last_name, phone, email, employee_status, employee_role) VALUES (?, ?, ?, ?, ?, ?)',
           [firstName, lastName, phone, email, status, role],
           (error, results) => {
             if (error) {

@@ -28,16 +28,16 @@ module.exports = ({ app, db }) => {
     // Update a customer by ID
     app.put('/Updatecustomers/:id', (req, res) => {
         const id = req.params.id;
-        const { first_name, last_name, birthday, phone, email } = req.body;
+        const { c_first_name, c_last_name, birthday, phone, email } = req.body;
 
         const updateFields = {};
 
-        if (first_name) {
-            updateFields.first_name = first_name;
+        if (c_first_name) {
+            updateFields.c_first_name = c_first_name;
         }
 
-        if (last_name) {
-            updateFields.last_name = last_name;
+        if (c_last_name) {
+            updateFields.c_last_name = c_last_name;
         }
 
         if (birthday) {
