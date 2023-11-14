@@ -3,9 +3,18 @@ import { mount } from 'cypress/vue'
 
 Cypress.Commands.add('mount', mount);
 
-describe('<WelcomeView />', () => {
-  it('renders', () => {
-    // see: https://on.cypress.io/mounting-vue
-    cy.mount(WelcomeView)
-  })
+describe('<WelcomeView /> Component', () => {
+  beforeEach(() => {
+    // Mount the component before each test
+    cy.mount(WelcomeView);
+  });
+
+  it('successfully mounts', () => {
+    // Check if the component is successfully mounted
+    cy.get('.welcome-view').should('exist');
+  });
+
+  it('displays the welcome message', () => {
+    cy.contains('h1', 'Welcome').should('be.visible');
+  });
 })
