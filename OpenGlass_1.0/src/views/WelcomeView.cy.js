@@ -1,15 +1,26 @@
-import WelcomeView from './WelcomeView.vue'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import { mount } from 'cypress/vue'
-import { createPinia } from 'pinia';
+import WelcomeView from './WelcomeView.vue'
 
 Cypress.Commands.add('mount', mount);
 
-describe('<WelcomeView />', () => {
-  it('renders', () => {
-    // Create a new instance of Pinia
-    const pinia = createPinia();
+describe('<WelcomeView /> Component', () => {
+  beforeEach(() => {
+    // Mock router
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [{ path: '/', component: WelcomeView }],
+    });
 
-    // see: https://on.cypress.io/mounting-vue
-    cy.mount(WelcomeView, { global: { plugins: [pinia] } })
-  })
-})
+    // Mount the component with the mock router
+    cy.mount(WelcomeView, {
+      global: {
+        plugins: [router],
+      },
+    });
+  });
+
+  it('renders correctly', () => {
+    // Your test assertions here
+  });
+});
