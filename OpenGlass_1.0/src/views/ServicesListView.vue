@@ -32,7 +32,17 @@
               <service-card :service="service" @selectService="selectService"></service-card>
             </div>
           </div>
-          <div>{{ selectedDrink }}</div>
+          <!-- Button to Open the Create Drink Modal -->
+          <div class="flex justify-start p-4">
+            <button 
+              class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded" 
+              @click="openModal">
+              Create Drink
+            </button>
+          </div>
+
+          <!-- Create Drink Modal Component -->
+          <CreateDrinkModal v-if="openCreateDrinkModal" @close="openCreateDrinkModal = false" />
           <div v-if="selectedService && selectedDrinks.length < selectedService.drinkLimit" class="mt-6">
             <label class="block mt-4 text-sm font-medium text-gray-700">Select a special drink:</label>
             <!-- Drink Cards -->
@@ -74,6 +84,7 @@
   import DrinkCard from '../components/PackagesView/DrinkCard.vue';
   import DateTimePicker from '../components/PackagesView/DateTimePicker.vue';
   import SignatureInput from '../components/PackagesView/SignatureInput.vue';
+  import CreateDrinkModal from '../components/PackagesView/CreateDrinkModal.vue';
   
   import { Swiper, SwiperSlide} from 'swiper/vue';
   import 'swiper/css';
@@ -90,9 +101,11 @@
       Swiper,
       SwiperSlide,
       ServiceCard,
+      CreateDrinkModal
     },
     setup() {
       const swiperRef = ref(null);
+      const openCreateDrinkModal = ref(false)
       const drinksDB = useDrinkStore();
       const servicesDB = useServiceStore();
       const drinksByType = computed(() => {
@@ -161,12 +174,18 @@
       });
       onMounted(getAllServicesDB)
 
+      function openModal() {
+        openCreateDrinkModal.value = true
+      }
+
       return {
         packages,
         onSwiper,
         selectPackage,
         drinksByType,
-        services
+        services,
+        openCreateDrinkModal,
+        openModal
       };
     },
     data() {
@@ -196,6 +215,9 @@
         },
     },
     methods: {
+      // openModal() {
+      //   openCreateDrinkModal.value = true
+      // },
       goBack() {
         this.selectedService = null
         this.selectedDate = null
