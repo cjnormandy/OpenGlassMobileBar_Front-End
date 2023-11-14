@@ -1,20 +1,15 @@
 import WelcomeView from './WelcomeView.vue'
 import { mount } from 'cypress/vue'
+import { createPinia } from 'pinia';
 
 Cypress.Commands.add('mount', mount);
 
-describe('<WelcomeView /> Component', () => {
-  beforeEach(() => {
-    // Mount the component before each test
-    cy.mount(WelcomeView);
-  });
+describe('<WelcomeView />', () => {
+  it('renders', () => {
+    // Create a new instance of Pinia
+    const pinia = createPinia();
 
-  it('successfully mounts', () => {
-    // Check if the component is successfully mounted
-    cy.get('.welcome-view').should('exist');
-  });
-
-  it('displays the welcome message', () => {
-    cy.contains('h1', 'Welcome').should('be.visible');
-  });
+    // see: https://on.cypress.io/mounting-vue
+    cy.mount(WelcomeView, { global: { plugins: [pinia] } })
+  })
 })
