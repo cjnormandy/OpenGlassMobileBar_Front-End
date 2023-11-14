@@ -11,7 +11,7 @@ const goToHome = () => {
 </script>
 
 <template>
-  <div class="absolute inset-x-0 top-40 z-1">
+  <div class="absolute inset-x-0 top-40 z-1" style="bottom: 0px">
     <!-- Jumbotron -->
     <div class="relative overflow-hidden bg-cover bg-no-repeat bg-center p-12 text-center" style="background-image: url('/gal_img1.png'); padding-bottom: 20%;"> 
         <!-- This padding value of 56.25% gives a 16:9 aspect ratio. Adjust as needed. -->
@@ -23,27 +23,60 @@ const goToHome = () => {
             </div>
         </div>
     </div>
-        <div class="p-2 hidden sm:mb-8 sm:flex sm:justify-center">
-            <div class="hidden sm:mb-8 sm:flex sm:justify-center">
-              <div class="flex lg:flex-1">
-              </div>
-            <div class="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
-                Announcing our next round of funding. 
-                <button @click="goToHome" class="font-semibold text-black">
-                    Read more <span aria-hidden="true">&rarr;</span>
-                </button>
+    <!--Welcome Content-->
+      <div class="text-center p-24">
+        <h1 class="text-4xl font-bold text-gray-900 sm:text-6xl p-2">Open Glass Mobile Bar</h1>
+        <p class="mt-6 text-lg leading-8 text-gray-600">Welcome to Open Glass Mobile Bar – where we craft more than just cocktails; 
+          We're on a mission to transform your event with an unforgettable mobile bartending experience! We believe that a great drink 
+          is more than just a mix of ingredients; it's a journey of flavors, an artful creation, and a memory in the making. 
+          Our passion lies in crafting inspired Latino cocktails that infuse a modern twist on classic favorites. 
+          Join us on a journey where every sip is a celebration of flavor, and every moment is a toast to a vibrant spirit.
+          <br><br>
+          With a team of skilled mixologists and a passion for perfection, we're here to turn your event into an extraordinary affair. 
+          From elegant weddings to lively corporate gatherings, we bring the bar to you, ensuring your guests are treated to an unforgettable experience. 
+          Welcome to a unique world of mobile bartending services that's ready to elevate your event to new horizons. Cheers to the Open Glass Mobile Bar experience! </p>
+      </div>
+      <!--Extra Content-->
+      <div class="text-center p-18">
+        <h3 class="text-4xl font-bold text-gray-900 sm:text-6xl"> Check out our Drink Menu and Packages!</h3>
+      </div>
+
+      <section class="mb-24 text-center">
+        <div class="grid gap-x-6 md:grid-cols-2 lg:gap-x-12 p-24">
+
+          <div class="mb-0 md:mb-0">
+            <div class="mb-2 inline-block rounded-md bg-primary-100 text-primary">
+              <img src="src/assets/calender_photo.png" alt="Calendar Photo" class="h-20 w-20"> <!-- Updated image source -->
             </div>
-        </div>
-        </div>
-        <div class="text-center">
-          <h1 class="text-4xl font-bold text-gray-900 sm:text-6xl p-2">Open Glass Mobile Bar</h1>
-          
-          <p class="mt-6 text-lg leading-8 text-gray-600">Hello! We are The Open Glass Mobile Bar. A professional, fully insured bartending company in Houston, TX that offers you and your guests a one-of-a-kind bartending experience. We serve weddings, special & corporate events with our 1959 vintage camper and other unique bar rental options.   We specialize in signature craft cocktails using seasonal and fresh ingredients and are committed to providing you and your guests a custom & memorable experience that will be talked about for days and toasted to for years to come!</p>
-          <div class="mt-10 flex items-center justify-center gap-x-6">
-            <a href="#" class="rounded-md bg-black px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">Get started</a>
-            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Learn more <span aria-hidden="true">→</span></a>
+            <router-link to="/menu" class="mb-4 text-lg font-bold block hover:text-gray-500">Drink Menu</router-link>
+            <p class="text-neutral-500 dark:text-neutral-300">
+              We currently feature over 20 specialty drinks! You provide the alcohol, and we provide you and your guests delicious drinks that are to die for.
+            </p>
+          </div>
+
+          <div class="mb-0 md:mb-0">
+            <div class="mb-2 inline-block rounded-md bg-primary-100 text-primary">
+              <img src="/pack_img1.png" alt="Package Image" class="h-20 w-20"> <!-- Updated image source -->
+            </div>
+            <router-link to="/packages" class="mb-4 text-lg font-bold block hover:text-gray-500">Service Packages</router-link>
+            <p class="text-neutral-500 dark:text-neutral-300">
+              We feature four different Service Packages for your event. Each are aimed at different crowd sizes. All with at least one bartenders, equipment, and great service.
+            </p>
           </div>
         </div>
-      </div>
-    <RouterView />
+        <!-- Instagram button section -->
+        <div class="p-8">
+        <a href="https://www.instagram.com/openglassmobilebar" target="_blank" class="bg-black text-white py-2 px-4 rounded-full hover:bg-gray-500 hover:text-white transition">
+          Follow us on Instagram
+        </a>
+        </div>
+      </section>
+  </div>
+  <RouterView />
 </template>
+
+<style scoped>
+h3 {
+  font-size: 2rem;
+}
+</style>
