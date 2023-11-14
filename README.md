@@ -12,9 +12,9 @@ Setting Up and Running the Backend
 To set up and run the backend, follow these steps:
 
 1. Navigate to the Backend Directory:
-```
-cd Backend
-```
+   ```
+   cd Backend
+   ```
 2. Install Dependencies:
    ```
    npm install
