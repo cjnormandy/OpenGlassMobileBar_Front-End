@@ -17,7 +17,7 @@
             <div>
                 <label for="email" >Email:</label>
                 <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                    <input id="email" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" v-model="formData.email" required />
+                    <input id="email" type="email" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" v-model="formData.email" required />
                 </div>
             </div>
             <div>
@@ -29,7 +29,7 @@
             <div>
                 <label for="phone" >Phone Number:</label>
                 <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                    <input id="phone" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" v-model="formData.phone" required />
+                    <input id="phone" type="tel" pattern="[0-9]{10}" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" v-model="formData.phone" required />
                 </div>
             </div>
             <div>
@@ -41,7 +41,7 @@
             <div>
                 <label for="date" >Date of Birth:</label>
                 <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                    <input id="date" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" type="date" v-model="formData.dob" required />
+                    <input id="dob" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" type="date" v-model="formData.dob" required  />
                 </div>
             </div>
             <div>
@@ -92,6 +92,18 @@
       onSignatureChange(e) {
         const signatureText = e.target.value;
         this.formData.signature = signatureText;
+      },
+      setMinDate() {
+        var dobInput = document.getElementById("dob");
+        var today = new Date();
+        today.setFullYear(today.getFullYear() - 21); // Set the year to 21 years ago
+
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        var yyyy = today.getFullYear();
+
+        // Set max date as 21 years ago from today
+        dobInput.setAttribute("max", yyyy + '-' + mm + '-' + dd);
       },
       addNewPayment() {
         const paymentData = {
@@ -340,6 +352,9 @@
         link.click();
         URL.revokeObjectURL(link.href);
       }
+    },
+    mounted() {
+      this.setMinDate();
     }
   };
   </script>

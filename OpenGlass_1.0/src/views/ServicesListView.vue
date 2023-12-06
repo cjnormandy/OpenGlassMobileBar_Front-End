@@ -10,12 +10,6 @@
             </div>
         </div>
     </div>
-    <!-- Back Button -->
-    <div class="flex justify-start p-4">
-      <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded" @click="goBack">
-        Back
-      </button>
-    </div>
 
     <!-- Jumbotron -->
     <div v-if="!selectedService">
@@ -41,10 +35,17 @@
             </button>
           </div> -->
 
+          <!-- Back Button -->
+          <div v-if="selectedService" class="flex justify-start p-4">
+            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded" @click="goBack">
+              Back
+            </button>
+          </div>
+
           <!-- Create Drink Modal Component -->
           <CreateDrinkModal v-if="openCreateDrinkModal" @close="openCreateDrinkModal = false" />
           <div v-if="selectedService && selectedDrinks.length < selectedService.drinkLimit" class="mt-6">
-            <label class="block mt-4 text-sm font-medium text-gray-700">Select a special drink:</label>
+            <label class="mb-4 text-4xl font-semibold">Select a special drink:</label>
             <!-- Drink Cards -->
             <drink-card
               v-for="(drinks, type) in drinksByType"
@@ -69,7 +70,7 @@
             <label class="block text-base font-semibold text-gray-700">Please enter your information:</label>
             <signature-input :signatureName="signatureName" :selectedDate="selectedDate" :service-amt="selectedService.price" :serv_id="selectedService.service_id"></signature-input>
             <div>
-              <button class="bg-gradient-to-r from-yellow-500 to-orange-500 w-full sm:w-32 py-2" @click="pay">Pay</button>
+              <button :disabled="!isFormValid" class="bg-gradient-to-r from-yellow-500 to-orange-500 w-full sm:w-32 py-2" @click="pay">Pay</button>
             </div>
           </div>
         </div>
@@ -212,6 +213,13 @@
                     this.$refs.signatureInput.focus();
                 });
             }
+        },
+    },
+    computed: {
+        isFormValid() {
+            return (
+                this.selectedDate.trim() !== ''
+            );
         },
     },
     methods: {

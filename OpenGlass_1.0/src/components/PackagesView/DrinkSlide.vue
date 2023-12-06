@@ -2,7 +2,7 @@
     <div class="slide-content flex">
         <div class="text-content flex-1">
             <div class="text">
-                <div class="title font-bold">{{ drink.drink_name }}</div>
+                <div class="title font-semibold">{{ drink.drink_name }}</div>
                 <div class="subtitle">{{ drink.drink_type }}</div>
                 <div class="p-20">
                     <p class="font-semibold">{{ drink.drink_description }}</p>

@@ -5,7 +5,6 @@
           <label for="date" class="block text-sm font-medium text-gray-700">Select a date:</label>
             <vue-tailwind-datepicker 
                 v-model="dateValue" 
-                no-input 
                 as-single 
                 :formatter="formatter"
                 :disable-date="dDate"
@@ -42,25 +41,15 @@ export default {
       month: 'MMM',
     });
 
-    const disabledDates = computed(() => {
-      let dates = [];
-      let currentDate = new Date();
-      const endDate = new Date(2023, 11, 8);
-      
-      while (currentDate <= endDate) {
-        const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek === 1 || dayOfWeek === 2 || dayOfWeek === 3) {
-          dates.push(currentDate.toISOString().split('T')[0]);
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      
-      return dates;
-    });
-
     function dDate(date) {
         const dayOfWeek = date.getDay();
-        return dayOfWeek === 1 || dayOfWeek === 2 || dayOfWeek === 3;
+        const today = new Date();
+const tomorrow = new Date(today);
+
+tomorrow.setDate(tomorrow.getDate() + 2);
+tomorrow.setHours(0, 0, 0, 0);
+        // if (date === today) { return true }
+        return dayOfWeek === 1 || dayOfWeek === 2 || dayOfWeek === 3 || date < tomorrow;
     }
 
     watch(dateValue, (newDate) => {
@@ -73,7 +62,6 @@ export default {
       dateValue,
       formatter,
       dDate,
-      disabledDates
     };
   },
   data() {
